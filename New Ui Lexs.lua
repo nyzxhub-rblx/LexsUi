@@ -1,3 +1,5 @@
+-- izin x2zu
+
 if (game:GetService("CoreGui")):FindFirstChild("Lexs") and (game:GetService("CoreGui")):FindFirstChild("ScreenGui") then
 	(game:GetService("CoreGui")).Lexs:Destroy();
 	(game:GetService("CoreGui")).ScreenGui:Destroy();
@@ -127,7 +129,7 @@ function Update:Notify(desc)
 	Image.BackgroundTransparency = 1;
 	Image.Position = UDim2.new(0, 8, 0, 8);
 	Image.Size = UDim2.new(0, 45, 0, 45);
-	Image.Image = "rbxassetid://105059922903197";
+	Image.Image = "rbxassetid://103875081318049";
 	Title.Parent = Frame;
 	Title.BackgroundColor3 = _G.Primary;
 	Title.BackgroundTransparency = 1;
