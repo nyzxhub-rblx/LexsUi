@@ -1,74 +1,59 @@
--- OKE DISINI
-local HttpService = game:GetService("HttpService")
+local HttpService = game:GetService("HttpService") -- V0.0.2
 
-_G.ConfigFolder = _G.ConfigFolder or "LexsHub/Config/"
-
-local function CheckFolders()
-    local mainFolder = _G.ConfigFolder:split("/")[1]
-    if not isfolder(mainFolder) then makefolder(mainFolder) end
-    if not isfolder(_G.ConfigFolder) then makefolder(_G.ConfigFolder) end
+if not isfolder("LexsHub") then
+    makefolder("LexsHub")
+end
+if not isfolder("LexsHub/Config") then
+    makefolder("LexsHub/Config")
 end
 
-ConfigData = {}
-Elements = {} 
-CURRENT_VERSION = nil
+local gameName   = tostring(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name)
+gameName         = gameName:gsub("[^%w_ ]", "")
+gameName         = gameName:gsub("%s+", "_")
 
-function SaveConfig(name)
-    CheckFolders()
-    local fileName = _G.ConfigFolder .. (name or "Default") .. ".json"
-    
+local ConfigFile = "LexsHub/Config/CHX_" .. gameName .. ".json"
+
+ConfigData       = {}
+Elements         = {}
+CURRENT_VERSION  = nil
+
+function SaveConfig()
     if writefile then
         ConfigData._version = CURRENT_VERSION
-        writefile(fileName, HttpService:JSONEncode(ConfigData))
+        writefile(ConfigFile, HttpService:JSONEncode(ConfigData))
     end
 end
 
-function LoadConfigFromFile(name)
-    CheckFolders()
-    local fileName = _G.ConfigFolder .. (name or "Default") .. ".json"
-    
-    if isfile and isfile(fileName) then
+function LoadConfigFromFile()
+    if not CURRENT_VERSION then return end
+    if isfile and isfile(ConfigFile) then
         local success, result = pcall(function()
-            return HttpService:JSONDecode(readfile(fileName))
+            return HttpService:JSONDecode(readfile(ConfigFile))
         end)
-        
         if success and type(result) == "table" then
-            ConfigData = result
-            
-            if LoadConfigElements then
-                LoadConfigElements()
+            if result._version == CURRENT_VERSION then
+                ConfigData = result
+            else
+                ConfigData = { _version = CURRENT_VERSION }
             end
-            return true
+        else
+            ConfigData = { _version = CURRENT_VERSION }
         end
+    else
+        ConfigData = { _version = CURRENT_VERSION }
     end
-    return false
 end
 
 function LoadConfigElements()
     for key, element in pairs(Elements) do
-        local targetValue = ConfigData[key]
-        
-        if element.Set then
-            if targetValue ~= nil then
-                element:Set(targetValue)
-            else
-                if element.Type == "Toggle" then
-                    element:Set(false)
-                elseif element.Type == "Slider" then
-                    element:Set(element.Default or 0)
-                elseif element.Type == "Dropdown" then
-                    element:Set(element.Default or "")
-                elseif element.Type == "Input" then
-                    element:Set("")
-                end
-            end
+        if ConfigData[key] ~= nil and element.Set then
+            element:Set(ConfigData[key], true)
         end
     end
 end
 
 local Icons = {
-    lexshub1   = "rbxassetid://71947103252559",
-    lexshub2   = "rbxassetid://103875081318049",
+    lexshub   = "rbxassetid://71947103252559",
     player    = "rbxassetid://12120698352",
     web       = "rbxassetid://137601480983962",
     bag       = "rbxassetid://8601111810",
@@ -488,19 +473,18 @@ end
 
 function LexsHub:Window(GuiConfig)
     GuiConfig              = GuiConfig or {}
-    GuiConfig.Title        = GuiConfig.Title or "Lexs Hub"
-    GuiConfig.Footer       = GuiConfig.Footer or "Lexs Hub >:D"
-    GuiConfig.Color        = GuiConfig.Color or Color3.fromRGB(0, 255, 255)
+    GuiConfig.Title        = GuiConfig.Title or "LexsHub"
+    GuiConfig.Footer       = GuiConfig.Footer or "Lexsss :3"
+    GuiConfig.Color        = GuiConfig.Color or Color3.fromRGB(255, 0, 255)
     GuiConfig["Tab Width"] = GuiConfig["Tab Width"] or 120
     GuiConfig.Version      = GuiConfig.Version or 1
-    GuiConfig.Icon         = GuiConfig.Icon or "rbxassetid://103875081318049"
 
     CURRENT_VERSION        = GuiConfig.Version
-    -- LoadConfigFromFile()
+    LoadConfigFromFile()
 
     local GuiFunc = {}
 
-    local LexsHubGui = Instance.new("ScreenGui");
+    local LexsHub = Instance.new("ScreenGui");
     local DropShadowHolder = Instance.new("Frame");
     local DropShadow = Instance.new("ImageLabel");
     local Main = Instance.new("Frame");
@@ -509,7 +493,6 @@ function LexsHub:Window(GuiConfig)
     local TextLabel = Instance.new("TextLabel");
     local UICorner1 = Instance.new("UICorner");
     local TextLabel1 = Instance.new("TextLabel");
-    local TitleIcon = Instance.new("ImageLabel");
     local Close = Instance.new("TextButton");
     local ImageLabel1 = Instance.new("ImageLabel");
     local Min = Instance.new("TextButton");
@@ -523,14 +506,11 @@ function LexsHub:Window(GuiConfig)
     local LayersReal = Instance.new("Frame");
     local LayersFolder = Instance.new("Folder");
     local LayersPageLayout = Instance.new("UIPageLayout");
-    local MainStroke = Instance.new("UIStroke");
-    local ThemeImage = Instance.new("ImageLabel");
-    local UICornerTheme = Instance.new("UICorner");
 
-    LexsHubGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    LexsHubGui.Name = "LexsHub"
-    LexsHubGui.ResetOnSpawn = false
-    LexsHubGui.Parent = game:GetService("CoreGui")
+    LexsHub.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    LexsHub.Name = "LexsHub"
+    LexsHub.ResetOnSpawn = false
+    LexsHub.Parent = game:GetService("CoreGui")
 
     DropShadowHolder.BackgroundTransparency = 1
     DropShadowHolder.BorderSizePixel = 0
@@ -543,10 +523,10 @@ function LexsHub:Window(GuiConfig)
     end
     DropShadowHolder.ZIndex = 0
     DropShadowHolder.Name = "DropShadowHolder"
-    DropShadowHolder.Parent = LexsHubGui
+    DropShadowHolder.Parent = LexsHub
 
-    DropShadowHolder.Position = UDim2.new(0, (LexsHubGui.AbsoluteSize.X // 2 - DropShadowHolder.Size.X.Offset // 2), 0,
-        (LexsHubGui.AbsoluteSize.Y // 2 - DropShadowHolder.Size.Y.Offset // 2))
+    DropShadowHolder.Position = UDim2.new(0, (LexsHub.AbsoluteSize.X // 2 - DropShadowHolder.Size.X.Offset // 2), 0,
+        (LexsHub.AbsoluteSize.Y // 2 - DropShadowHolder.Size.Y.Offset // 2))
     DropShadow.Image = "rbxassetid://6015897843"
     DropShadow.ImageColor3 = Color3.fromRGB(15, 15, 15)
     DropShadow.ImageTransparency = 1
@@ -569,8 +549,8 @@ function LexsHub:Window(GuiConfig)
         Main.BackgroundTransparency = 1
         Main.ImageTransparency = GuiConfig.ThemeTransparency or 0.15
     else
-        Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Latar Warna Window
-        Main.BackgroundTransparency = 0.15
+        Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        Main.BackgroundTransparency = 0
     end
 
     Main.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -597,6 +577,15 @@ function LexsHub:Window(GuiConfig)
     Top.Name = "Top"
     Top.Parent = Main
 
+    TitleIcon.Name = "TitleIcon"
+    TitleIcon.Parent = Top
+    TitleIcon.BackgroundTransparency = 1
+    TitleIcon.BorderSizePixel = 0
+    TitleIcon.AnchorPoint = Vector2.new(0, 0.5)
+    TitleIcon.Position = UDim2.new(0, 10, 0.5, 0) 
+    TitleIcon.Size = UDim2.new(0, 20, 0, 20)
+    TitleIcon.Image = GuiConfig.Icon
+
     local ImageWrapper = Instance.new("Frame")
     ImageWrapper.Name = "ImageWrapper"
     ImageWrapper.Parent = Main
@@ -613,7 +602,7 @@ function LexsHub:Window(GuiConfig)
     ThemeImage.Position = UDim2.new(1, 0, 1, 0)
     ThemeImage.Size = UDim2.new(0.55, 0, 1.0, 0) -- ga terlalu gede
     ThemeImage.ZIndex = 0
-    ThemeImage.Image = "rbxassetid://14835376820"
+    ThemeImage.Image = "rbxassetid://75650154710506"
     ThemeImage.ImageTransparency = 0.45
     ThemeImage.ScaleType = Enum.ScaleType.Fit
 
@@ -634,11 +623,11 @@ function LexsHub:Window(GuiConfig)
     TextLabel.TextSize = 14
     TextLabel.TextXAlignment = Enum.TextXAlignment.Left
     TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    TextLabel.BackgroundTransparency = 0.999
+    TextLabel.BackgroundTransparency = 0.9990000128746033
     TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
     TextLabel.BorderSizePixel = 0
-    TextLabel.Size = UDim2.new(1, -135, 1, 0) 
-    TextLabel.Position = UDim2.new(0, 35, 0, 0) 
+    TextLabel.Size = UDim2.new(1, -100, 1, 0)
+    TextLabel.Position = UDim2.new(0, 10, 0, 0)
     TextLabel.Parent = Top
 
     UICorner1.Parent = Top
@@ -653,7 +642,7 @@ function LexsHub:Window(GuiConfig)
     TextLabel1.BorderColor3 = Color3.fromRGB(0, 0, 0)
     TextLabel1.BorderSizePixel = 0
     TextLabel1.Size = UDim2.new(1, -(TextLabel.TextBounds.X + 104), 1, 0)
-    TextLabel1.Position = UDim2.new(0, 25 + TextLabel.TextBounds.X + 10, 0, 0)
+    TextLabel1.Position = UDim2.new(0, TextLabel.TextBounds.X + 15, 0, 0)
     TextLabel1.Parent = Top
 
     Close.Font = Enum.Font.SourceSans
@@ -836,11 +825,11 @@ function LexsHub:Window(GuiConfig)
     ScrollTab.BackgroundTransparency = 0.9990000128746033
     ScrollTab.BorderColor3 = Color3.fromRGB(0, 0, 0)
     ScrollTab.BorderSizePixel = 0
-    ScrollTab.Size = UDim2.new(1, 0, 1, -50)
+    ScrollTab.Size = UDim2.new(1, 0, 1, 0)
     ScrollTab.Name = "ScrollTab"
     ScrollTab.Parent = LayersTab
 
-    UIListLayout.Padding = UDim.new(0, 2)
+    UIListLayout.Padding = UDim.new(0, 3)
     UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
     UIListLayout.Parent = ScrollTab
 
@@ -857,8 +846,8 @@ function LexsHub:Window(GuiConfig)
     ScrollTab.ChildRemoved:Connect(UpdateSize1)
 
     function GuiFunc:DestroyGui()
-        if CoreGui:FindFirstChild("LexsHubGui") then
-            LexsHubGui:Destroy()
+        if CoreGui:FindFirstChild("LexsHub") then
+            LexsHub:Destroy()
         end
     end
 
@@ -876,10 +865,11 @@ function LexsHub:Window(GuiConfig)
         Overlay.ZIndex = 50
         Overlay.Parent = DropShadowHolder
 
-        local Dialog = Instance.new("Frame")
+        local Dialog = Instance.new("ImageLabel")
         Dialog.Size = UDim2.new(0, 300, 0, 150)
         Dialog.Position = UDim2.new(0.5, -150, 0.5, -75)
-        Dialog.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        Dialog.Image = "rbxassetid://9542022979"
+        Dialog.ImageTransparency = 0
         Dialog.BorderSizePixel = 0
         Dialog.ZIndex = 51
         Dialog.Parent = Overlay
@@ -963,13 +953,7 @@ function LexsHub:Window(GuiConfig)
         Instance.new("UICorner", Cancel).CornerRadius = UDim.new(0, 6)
 
         Yes.MouseButton1Click:Connect(function()
-            ConfigData = { _version = CURRENT_VERSION }
-            if LoadConfigElements then
-                LoadConfigElements()
-            end
-            ScriptLoaded = false
-            NoclipEnabled = false
-            if LexsHubGui then LexsHubGui:Destroy() end
+            if LexsHub then LexsHub:Destroy() end
             if game.CoreGui:FindFirstChild("ToggleUIButton") then
                 game.CoreGui.ToggleUIButton:Destroy()
             end
@@ -978,16 +962,6 @@ function LexsHub:Window(GuiConfig)
         Cancel.MouseButton1Click:Connect(function()
             Overlay:Destroy()
         end)
-    end)
-
-    local ToggleKey = Enum.KeyCode.F3
-    UserInputService.InputBegan:Connect(function(input, gpe)
-        if gpe then return end
-        if input.KeyCode == ToggleKey then
-            if DropShadowHolder then
-                DropShadowHolder.Visible = not DropShadowHolder.Visible
-            end
-        end
     end)
 
     function GuiFunc:ToggleUI()
@@ -1140,13 +1114,13 @@ function LexsHub:Window(GuiConfig)
     UICorner36.CornerRadius = UDim.new(0, 3)
     UICorner36.Parent = DropdownSelect
 
-    UIStroke14.Color = Color3.fromRGB(189, 162, 241)
+    UIStroke14.Color = Color3.fromRGB(12, 159, 255)
     UIStroke14.Thickness = 2.5
     UIStroke14.Transparency = 0.8
     UIStroke14.Parent = DropdownSelect
 
     DropdownSelectReal.AnchorPoint = Vector2.new(0.5, 0.5)
-    DropdownSelectReal.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Latar Warna Dropdown
+    DropdownSelectReal.BackgroundColor3 = Color3.fromRGB(0, 27, 98)
     DropdownSelectReal.BackgroundTransparency = 0.7
     DropdownSelectReal.BorderColor3 = Color3.fromRGB(0, 0, 0)
     DropdownSelectReal.BorderSizePixel = 0
@@ -1212,7 +1186,7 @@ function LexsHub:Window(GuiConfig)
         Tab.BorderColor3 = Color3.fromRGB(0, 0, 0)
         Tab.BorderSizePixel = 0
         Tab.LayoutOrder = CountTab
-        Tab.Size = UDim2.new(1, 0, 0, 28)
+        Tab.Size = UDim2.new(1, 0, 0, 30)
         Tab.Name = "Tab"
         Tab.Parent = ScrollTab
 
@@ -1233,7 +1207,7 @@ function LexsHub:Window(GuiConfig)
         TabButton.Parent = Tab
 
         TabName.Font = Enum.Font.GothamBold
-        TabName.Text = tostring(TabConfig.Name)
+        TabName.Text = "| " .. tostring(TabConfig.Name)
         TabName.TextColor3 = Color3.fromRGB(255, 255, 255)
         TabName.TextSize = 13
         TabName.TextXAlignment = Enum.TextXAlignment.Left
@@ -1242,7 +1216,7 @@ function LexsHub:Window(GuiConfig)
         TabName.BorderColor3 = Color3.fromRGB(0, 0, 0)
         TabName.BorderSizePixel = 0
         TabName.Size = UDim2.new(1, 0, 1, 0)
-        TabName.Position = UDim2.new(0, 10, 0, 0)
+        TabName.Position = UDim2.new(0, 30, 0, 0)
         TabName.Name = "TabName"
         TabName.Parent = Tab
 
@@ -1254,7 +1228,6 @@ function LexsHub:Window(GuiConfig)
         FeatureImg.Size = UDim2.new(0, 16, 0, 16)
         FeatureImg.Name = "FeatureImg"
         FeatureImg.Parent = Tab
-        FeatureImg.Visible = false -- Hide Icon Maybe
         if CountTab == 0 then
             LayersPageLayout:JumpToIndex(0)
             NameTab.Text = TabConfig.Name
@@ -1262,8 +1235,8 @@ function LexsHub:Window(GuiConfig)
             ChooseFrame.BackgroundColor3 = GuiConfig.Color
             ChooseFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
             ChooseFrame.BorderSizePixel = 0
-            ChooseFrame.Position = UDim2.new(0, 0, 0, 5)
-            ChooseFrame.Size = UDim2.new(0, 3, 0, 20)
+            ChooseFrame.Position = UDim2.new(0, 2, 0, 9)
+            ChooseFrame.Size = UDim2.new(0, 1, 0, 12)
             ChooseFrame.Name = "ChooseFrame"
             ChooseFrame.Parent = Tab
 
@@ -1308,24 +1281,24 @@ function LexsHub:Window(GuiConfig)
                     TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.InOut),
                     { BackgroundTransparency = 0.9200000166893005 }
                 ):Play()
-                
-                FrameChoose.Parent = Tab
-                FrameChoose.Position = UDim2.new(0, 0, 0, 5)
-                FrameChoose.Size = UDim2.new(0, 3, 0, 20)
-                
+                TweenService:Create(
+                    FrameChoose,
+                    TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
+                    { Position = UDim2.new(0, 2, 0, 9 + (33 * Tab.LayoutOrder)) }
+                ):Play()
                 LayersPageLayout:JumpToIndex(Tab.LayoutOrder)
                 task.wait(0.05)
                 NameTab.Text = TabConfig.Name
                 TweenService:Create(
                     FrameChoose,
                     TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-                    { Size = UDim2.new(0, 3, 0, 20) } 
+                    { Size = UDim2.new(0, 1, 0, 20) }
                 ):Play()
                 task.wait(0.2)
                 TweenService:Create(
                     FrameChoose,
                     TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-                    { Size = UDim2.new(0, 3, 0, 18) } 
+                    { Size = UDim2.new(0, 1, 0, 12) }
                 ):Play()
             end
         end)
@@ -1340,10 +1313,12 @@ function LexsHub:Window(GuiConfig)
             local UIGradient = Instance.new("UIGradient");
 
             Section.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            Section.BackgroundTransparency = 0.999 
+            Section.BackgroundTransparency = 0.9990000128746033
+            Section.BorderColor3 = Color3.fromRGB(0, 0, 0)
             Section.BorderSizePixel = 0
             Section.LayoutOrder = CountSection
             Section.ClipsDescendants = true
+            Section.LayoutOrder = 1
             Section.Size = UDim2.new(1, 0, 0, 30)
             Section.Name = "Section"
             Section.Parent = ScrolLayers
@@ -1355,21 +1330,15 @@ function LexsHub:Window(GuiConfig)
             local FeatureFrame = Instance.new("Frame");
             local FeatureImg = Instance.new("ImageLabel");
             local SectionTitle = Instance.new("TextLabel");
-            -- local SectionOutline = Instance.new("UIStroke")
-
-            -- SectionOutline.Name = "SectionOutline"
-            -- SectionOutline.Parent = SectionReal 
-            -- SectionOutline.Color = Color3.fromRGB(189, 162, 241) 
-            -- SectionOutline.Thickness = 1.5
-            -- SectionOutline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            -- SectionOutline.Transparency = 0.2 
 
             SectionReal.AnchorPoint = Vector2.new(0.5, 0)
             SectionReal.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             SectionReal.BackgroundTransparency = 0.9350000023841858
+            SectionReal.BorderColor3 = Color3.fromRGB(0, 0, 0)
             SectionReal.BorderSizePixel = 0
+            SectionReal.LayoutOrder = 1
             SectionReal.Position = UDim2.new(0.5, 0, 0, 0)
-            SectionReal.Size = UDim2.new(1, -2, 0, 30)
+            SectionReal.Size = UDim2.new(1, 1, 0, 30)
             SectionReal.Name = "SectionReal"
             SectionReal.Parent = Section
 
@@ -1469,11 +1438,6 @@ function LexsHub:Window(GuiConfig)
             UIListLayout2.Parent = SectionAdd
 
             local OpenSection = false
-            local isAnimating = false
-
-            local ANIM_TIME = 0.25
-            local ANIM_STYLE = Enum.EasingStyle.Quart
-            local ANIM_DIR = Enum.EasingDirection.Out
 
             local function UpdateSizeScroll()
                 local OffsetY = 0
@@ -1493,20 +1457,14 @@ function LexsHub:Window(GuiConfig)
                             SectionSizeYWitdh = SectionSizeYWitdh + v.Size.Y.Offset + 3
                         end
                     end
-                    
-                    local tweenInfo = TweenInfo.new(ANIM_TIME, ANIM_STYLE, ANIM_DIR)
-                    local tweens = {
-                        TweenService:Create(FeatureImg, tweenInfo, { Rotation = 0 }),
-                        TweenService:Create(Section, tweenInfo, { Size = UDim2.new(1, 1, 0, SectionSizeYWitdh) }),
-                        TweenService:Create(SectionAdd, tweenInfo, { Size = UDim2.new(1, 0, 0, SectionSizeYWitdh - 38) }),
-                        TweenService:Create(SectionDecideFrame, tweenInfo, { Size = UDim2.new(1, 0, 0, 2) })
-                    }
-                    
-                    for _, tween in tweens do
-                        tween:Play()
-                    end
-                    
-                    task.delay(ANIM_TIME, UpdateSizeScroll)
+                    TweenService:Create(FeatureFrame, TweenInfo.new(0.5), { Rotation = 90 }):Play()
+                    TweenService:Create(Section, TweenInfo.new(0.5), { Size = UDim2.new(1, 1, 0, SectionSizeYWitdh) })
+                        :Play()
+                    TweenService:Create(SectionAdd, TweenInfo.new(0.5),
+                        { Size = UDim2.new(1, 0, 0, SectionSizeYWitdh - 38) }):Play()
+                    TweenService:Create(SectionDecideFrame, TweenInfo.new(0.5), { Size = UDim2.new(1, 0, 0, 2) }):Play()
+                    task.wait(0.5)
+                    UpdateSizeScroll()
                 end
             end
 
@@ -1524,44 +1482,18 @@ function LexsHub:Window(GuiConfig)
 
             if AlwaysOpen ~= true then
                 SectionButton.Activated:Connect(function()
-                    if isAnimating then return end
-                    isAnimating = true
-                    
                     CircleClick(SectionButton, Mouse.X, Mouse.Y)
-                    
-                    local tweenInfo = TweenInfo.new(ANIM_TIME, ANIM_STYLE, ANIM_DIR)
-                    
-                    OpenSection = not OpenSection
-                    
                     if OpenSection then
-                        TweenService:Create(SectionTitle, TweenInfo.new(0.2), { 
-                            TextColor3 = GuiConfig.Color 
-                        }):Play()
-                        
-                        UpdateSizeSection() 
-                        
-                        task.delay(ANIM_TIME, function()
-                            isAnimating = false
-                        end)
+                        TweenService:Create(FeatureFrame, TweenInfo.new(0.5), { Rotation = 0 }):Play()
+                        TweenService:Create(Section, TweenInfo.new(0.5), { Size = UDim2.new(1, 1, 0, 30) }):Play()
+                        TweenService:Create(SectionDecideFrame, TweenInfo.new(0.5), { Size = UDim2.new(0, 0, 0, 2) })
+                            :Play()
+                        OpenSection = false
+                        task.wait(0.5)
+                        UpdateSizeScroll()
                     else
-                        TweenService:Create(SectionTitle, TweenInfo.new(0.2), { 
-                            TextColor3 = Color3.fromRGB(230, 230, 230) 
-                        }):Play()
-                        
-                        local tweens = {
-                            TweenService:Create(FeatureImg, tweenInfo, { Rotation = -90 }),
-                            TweenService:Create(Section, tweenInfo, { Size = UDim2.new(1, 1, 0, 30) }),
-                            TweenService:Create(SectionDecideFrame, tweenInfo, { Size = UDim2.new(0, 0, 0, 2) })
-                        }
-                        
-                        for _, tween in tweens do
-                            tween:Play()
-                        end
-                        
-                        task.delay(ANIM_TIME, function()
-                            UpdateSizeScroll()
-                            isAnimating = false
-                        end)
+                        OpenSection = true
+                        UpdateSizeSection()
                     end
                 end)
             end
@@ -1574,21 +1506,15 @@ function LexsHub:Window(GuiConfig)
                         SectionSizeYWitdh = SectionSizeYWitdh + v.Size.Y.Offset + 3
                     end
                 end
-                FeatureImg.Rotation = 0
+                FeatureFrame.Rotation = 90
                 Section.Size = UDim2.new(1, 1, 0, SectionSizeYWitdh)
                 SectionAdd.Size = UDim2.new(1, 0, 0, SectionSizeYWitdh - 38)
                 SectionDecideFrame.Size = UDim2.new(1, 0, 0, 2)
                 UpdateSizeScroll()
             end
 
-            SectionAdd.ChildAdded:Connect(function()
-                task.wait(0.05)
-                UpdateSizeSection()
-            end)
-            SectionAdd.ChildRemoved:Connect(function()
-                task.wait(0.05)
-                UpdateSizeSection()
-            end)
+            SectionAdd.ChildAdded:Connect(UpdateSizeSection)
+            SectionAdd.ChildRemoved:Connect(UpdateSizeSection)
 
             local layout = ScrolLayers:FindFirstChildOfClass("UIListLayout")
             if layout then
@@ -1661,7 +1587,7 @@ function LexsHub:Window(GuiConfig)
                 ParagraphContent.BackgroundTransparency = 1
                 ParagraphContent.Position = UDim2.new(0, iconOffset, 0, 25)
                 ParagraphContent.Name = "ParagraphContent"
-                ParagraphContent.TextWrapped = true
+                ParagraphContent.TextWrapped = false
                 ParagraphContent.RichText = true
                 ParagraphContent.Parent = Paragraph
 
@@ -1859,7 +1785,7 @@ function LexsHub:Window(GuiConfig)
                     InputBox.FocusLost:Connect(function()
                         PanelFunc.Value = InputBox.Text
                         ConfigData[configKey] = InputBox.Text
-                        -- SaveConfig()
+                        SaveConfig()
                     end)
                 end
 
@@ -1944,8 +1870,6 @@ function LexsHub:Window(GuiConfig)
                 end
 
                 local ToggleFunc = { Value = ToggleConfig.Default }
-                
-                local isInCallback = false
 
                 local Toggle = Instance.new("Frame")
                 local UICorner20 = Instance.new("UICorner")
@@ -2074,43 +1998,35 @@ function LexsHub:Window(GuiConfig)
                 end)
 
                 function ToggleFunc:Set(Value)
-                    ToggleFunc.Value = Value
+                    if typeof(ToggleConfig.Callback) == "function" then
+                        local ok, err = pcall(function()
+                            ToggleConfig.Callback(Value)
+                        end)
+                        if not ok then warn("Toggle Callback error:", err) end
+                    end
                     ConfigData[configKey] = Value
-
+                    SaveConfig()
                     if Value then
                         TweenService:Create(ToggleTitle, TweenInfo.new(0.2), { TextColor3 = GuiConfig.Color }):Play()
-                        TweenService:Create(ToggleCircle, TweenInfo.new(0.2), { Position = UDim2.new(0, 15, 0, 0) }):Play()
-                        TweenService:Create(UIStroke8, TweenInfo.new(0.2), { Color = GuiConfig.Color, Transparency = 0 }):Play()
-                        TweenService:Create(FeatureFrame2, TweenInfo.new(0.2), { BackgroundColor3 = GuiConfig.Color, BackgroundTransparency = 0 }):Play()
+                        TweenService:Create(ToggleCircle, TweenInfo.new(0.2), { Position = UDim2.new(0, 15, 0, 0) })
+                            :Play()
+                        TweenService:Create(UIStroke8, TweenInfo.new(0.2), { Color = GuiConfig.Color, Transparency = 0 })
+                            :Play()
+                        TweenService:Create(FeatureFrame2, TweenInfo.new(0.2),
+                            { BackgroundColor3 = GuiConfig.Color, BackgroundTransparency = 0 }):Play()
                     else
-                        TweenService:Create(ToggleTitle, TweenInfo.new(0.2), { TextColor3 = Color3.fromRGB(230, 230, 230) }):Play()
+                        TweenService:Create(ToggleTitle, TweenInfo.new(0.2),
+                            { TextColor3 = Color3.fromRGB(230, 230, 230) }):Play()
                         TweenService:Create(ToggleCircle, TweenInfo.new(0.2), { Position = UDim2.new(0, 0, 0, 0) }):Play()
-                        TweenService:Create(UIStroke8, TweenInfo.new(0.2), { Color = Color3.fromRGB(255, 255, 255), Transparency = 0.9 }):Play()
-                        TweenService:Create(FeatureFrame2, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 0.92 }):Play()
-                    end
-
-                    if not isInCallback then
-                        isInCallback = true
-                        
-                        task.spawn(function()
-                            if typeof(ToggleConfig.Callback) == "function" then
-                                local ok, err = pcall(function()
-                                    ToggleConfig.Callback(Value)
-                                end)
-                                if not ok then 
-                                    warn("Toggle Callback error:", err) 
-                                end
-                            end
-                            
-                            task.wait(0.05)
-                            isInCallback = false
-                        end)
+                        TweenService:Create(UIStroke8, TweenInfo.new(0.2),
+                            { Color = Color3.fromRGB(255, 255, 255), Transparency = 0.9 }):Play()
+                        TweenService:Create(FeatureFrame2, TweenInfo.new(0.2),
+                            { BackgroundColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 0.92 }):Play()
                     end
                 end
 
                 ToggleFunc:Set(ToggleFunc.Value)
                 CountItem = CountItem + 1
-                ToggleFunc.Type = "Toggle"
                 Elements[configKey] = ToggleFunc
                 return ToggleFunc
             end
@@ -2289,7 +2205,7 @@ function LexsHub:Window(GuiConfig)
 
                     SliderConfig.Callback(Value)
                     ConfigData[configKey] = Value
-                    -- SaveConfig()
+                    SaveConfig()
                 end
 
                 SliderFrame.InputBegan:Connect(function(Input)
@@ -2332,27 +2248,17 @@ function LexsHub:Window(GuiConfig)
                     end
                 end)
 
-                -- TextBox:GetPropertyChangedSignal("Text"):Connect(function()
-                --     local Valid = TextBox.Text:gsub("[^%d]", "")
-                --     if Valid ~= "" then
-                --         local ValidNumber = math.clamp(tonumber(Valid), SliderConfig.Min, SliderConfig.Max)
-                --         SliderFunc:Set(ValidNumber)
-                --     else
-                --         SliderFunc:Set(SliderConfig.Min)
-                --     end
-                -- end)
-                TextBox.FocusLost:Connect(function(enterPressed)
+                TextBox:GetPropertyChangedSignal("Text"):Connect(function()
                     local Valid = TextBox.Text:gsub("[^%d]", "")
                     if Valid ~= "" then
                         local ValidNumber = math.clamp(tonumber(Valid), SliderConfig.Min, SliderConfig.Max)
                         SliderFunc:Set(ValidNumber)
                     else
-                        TextBox.Text = tostring(SliderFunc.Value)  -- Reset ke value terakhir
+                        SliderFunc:Set(SliderConfig.Min)
                     end
                 end)
                 SliderFunc:Set(SliderConfig.Default)
                 CountItem = CountItem + 1
-                SliderFunc.Type = "Slider"
                 Elements[configKey] = SliderFunc
                 return SliderFunc
             end
@@ -2360,7 +2266,6 @@ function LexsHub:Window(GuiConfig)
             function Items:AddInput(InputConfig)
                 local InputConfig = InputConfig or {}
                 InputConfig.Title = InputConfig.Title or "Title"
-                InputConfig.Placeholder = InputConfig.Placeholder or nil
                 InputConfig.Content = InputConfig.Content or ""
                 InputConfig.Callback = InputConfig.Callback or function() end
                 InputConfig.Default = InputConfig.Default or ""
@@ -2372,19 +2277,20 @@ function LexsHub:Window(GuiConfig)
 
                 local InputFunc = { Value = InputConfig.Default }
 
-                local Input = Instance.new("Frame")
-                local UICorner12 = Instance.new("UICorner")
-                local InputTitle = Instance.new("TextLabel")
-                local InputFrame = Instance.new("Frame")
-                local UICorner13 = Instance.new("UICorner")
-                local InputTextBox = Instance.new("TextBox")
+                local Input = Instance.new("Frame");
+                local UICorner12 = Instance.new("UICorner");
+                local InputTitle = Instance.new("TextLabel");
+                local InputContent = Instance.new("TextLabel");
+                local InputFrame = Instance.new("Frame");
+                local UICorner13 = Instance.new("UICorner");
+                local InputTextBox = Instance.new("TextBox");
 
                 Input.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                Input.BackgroundTransparency = 0.935
+                Input.BackgroundTransparency = 0.9350000023841858
                 Input.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 Input.BorderSizePixel = 0
                 Input.LayoutOrder = CountItem
-                Input.Size = UDim2.new(1, 0, 0, 70)
+                Input.Size = UDim2.new(1, 0, 0, 46)
                 Input.Name = "Input"
                 Input.Parent = SectionAdd
 
@@ -2393,22 +2299,58 @@ function LexsHub:Window(GuiConfig)
 
                 InputTitle.Font = Enum.Font.GothamBold
                 InputTitle.Text = InputConfig.Title or "TextBox"
-                InputTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
+                InputTitle.TextColor3 = Color3.fromRGB(230.77499270439148, 230.77499270439148, 230.77499270439148)
                 InputTitle.TextSize = 13
                 InputTitle.TextXAlignment = Enum.TextXAlignment.Left
                 InputTitle.TextYAlignment = Enum.TextYAlignment.Top
-                InputTitle.BackgroundTransparency = 1
+                InputTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                InputTitle.BackgroundTransparency = 0.9990000128746033
+                InputTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                InputTitle.BorderSizePixel = 0
                 InputTitle.Position = UDim2.new(0, 10, 0, 10)
-                InputTitle.Size = UDim2.new(1, -20, 0, 15)
+                InputTitle.Size = UDim2.new(1, -180, 0, 13)
                 InputTitle.Name = "InputTitle"
                 InputTitle.Parent = Input
 
+                InputContent.Font = Enum.Font.GothamBold
+                InputContent.Text = InputConfig.Content or "This is a TextBox"
+                InputContent.TextColor3 = Color3.fromRGB(255, 255, 255)
+                InputContent.TextSize = 12
+                InputContent.TextTransparency = 0.6000000238418579
+                InputContent.TextWrapped = true
+                InputContent.TextXAlignment = Enum.TextXAlignment.Left
+                InputContent.TextYAlignment = Enum.TextYAlignment.Bottom
+                InputContent.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                InputContent.BackgroundTransparency = 0.9990000128746033
+                InputContent.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                InputContent.BorderSizePixel = 0
+                InputContent.Position = UDim2.new(0, 10, 0, 25)
+                InputContent.Size = UDim2.new(1, -180, 0, 12)
+                InputContent.Name = "InputContent"
+                InputContent.Parent = Input
+
+                InputContent.Size = UDim2.new(1, -180, 0,
+                    12 + (12 * (InputContent.TextBounds.X // InputContent.AbsoluteSize.X)))
+                InputContent.TextWrapped = true
+                Input.Size = UDim2.new(1, 0, 0, InputContent.AbsoluteSize.Y + 33)
+
+                InputContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+                    InputContent.TextWrapped = false
+                    InputContent.Size = UDim2.new(1, -180, 0,
+                        12 + (12 * (InputContent.TextBounds.X // InputContent.AbsoluteSize.X)))
+                    Input.Size = UDim2.new(1, 0, 0, InputContent.AbsoluteSize.Y + 33)
+                    InputContent.TextWrapped = true
+                    UpdateSizeSection()
+                end)
+
+                InputFrame.AnchorPoint = Vector2.new(1, 0.5)
                 InputFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                InputFrame.BackgroundTransparency = 0.95
+                InputFrame.BackgroundTransparency = 0.949999988079071
+                InputFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 InputFrame.BorderSizePixel = 0
                 InputFrame.ClipsDescendants = true
-                InputFrame.Position = UDim2.new(0, 10, 0, 35) 
-                InputFrame.Size = UDim2.new(1, -20, 0, 25)
+                InputFrame.Position = UDim2.new(1, -7, 0.5, 0)
+                InputFrame.Size = UDim2.new(0, 148, 0, 30)
                 InputFrame.Name = "InputFrame"
                 InputFrame.Parent = Input
 
@@ -2417,24 +2359,28 @@ function LexsHub:Window(GuiConfig)
 
                 InputTextBox.CursorPosition = -1
                 InputTextBox.Font = Enum.Font.GothamBold
-                InputTextBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
-                InputTextBox.PlaceholderText = InputConfig.Placeholder or "Input Here"
+                InputTextBox.PlaceholderColor3 = Color3.fromRGB(120.00000044703484, 120.00000044703484,
+                    120.00000044703484)
+                InputTextBox.PlaceholderText = "Input Here"
                 InputTextBox.Text = InputConfig.Default
-                InputTextBox.TextColor3 = Color3.fromRGB(200, 200, 200)
+                InputTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
                 InputTextBox.TextSize = 12
                 InputTextBox.TextXAlignment = Enum.TextXAlignment.Left
-                InputTextBox.BackgroundTransparency = 1
-                InputTextBox.Position = UDim2.new(0, 8, 0, 0)
-                InputTextBox.Size = UDim2.new(1, -16, 1, 0)
+                InputTextBox.AnchorPoint = Vector2.new(0, 0.5)
+                InputTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                InputTextBox.BackgroundTransparency = 0.9990000128746033
+                InputTextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                InputTextBox.BorderSizePixel = 0
+                InputTextBox.Position = UDim2.new(0, 5, 0.5, 0)
+                InputTextBox.Size = UDim2.new(1, -10, 1, -8)
                 InputTextBox.Name = "InputTextBox"
                 InputTextBox.Parent = InputFrame
-                InputTextBox.ClearTextOnFocus = false
-
                 function InputFunc:Set(Value)
                     InputTextBox.Text = Value
                     InputFunc.Value = Value
                     InputConfig.Callback(Value)
                     ConfigData[configKey] = Value
+                    SaveConfig()
                 end
 
                 InputFunc:Set(InputFunc.Value)
@@ -2442,13 +2388,11 @@ function LexsHub:Window(GuiConfig)
                 InputTextBox.FocusLost:Connect(function()
                     InputFunc:Set(InputTextBox.Text)
                 end)
-
                 CountItem = CountItem + 1
-                InputFunc.Type = "Input"
                 Elements[configKey] = InputFunc
                 return InputFunc
             end
-            
+
             function Items:AddDropdown(DropdownConfig)
                 local DropdownConfig = DropdownConfig or {}
                 DropdownConfig.Title = DropdownConfig.Title or "Title"
@@ -2709,7 +2653,7 @@ function LexsHub:Window(GuiConfig)
                     end
 
                     ConfigData[configKey] = DropdownFunc.Value
-                    -- SaveConfig()
+                    SaveConfig()
 
                     local texts = {}
                     for _, Drop in ScrollSelect:GetChildren() do
@@ -2772,7 +2716,6 @@ function LexsHub:Window(GuiConfig)
 
                 CountItem = CountItem + 1
                 CountDropdown = CountDropdown + 1
-                DropdownFunc.Type = "Dropdown"
                 Elements[configKey] = DropdownFunc
                 return DropdownFunc
             end
@@ -2815,14 +2758,13 @@ function LexsHub:Window(GuiConfig)
                 SubSection.Size = UDim2.new(1, 0, 0, 22)
                 SubSection.LayoutOrder = CountItem
 
-                -- HAPUS Background box
-                -- local Background = Instance.new("Frame")
-                -- Background.Parent = SubSection
-                -- Background.Size = UDim2.new(1, 0, 1, 0)
-                -- Background.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                -- Background.BackgroundTransparency = 0.935
-                -- Background.BorderSizePixel = 0
-                -- Instance.new("UICorner", Background).CornerRadius = UDim.new(0, 6)
+                local Background = Instance.new("Frame")
+                Background.Parent = SubSection
+                Background.Size = UDim2.new(1, 0, 1, 0)
+                Background.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                Background.BackgroundTransparency = 0.935
+                Background.BorderSizePixel = 0
+                Instance.new("UICorner", Background).CornerRadius = UDim.new(0, 6)
 
                 local Label = Instance.new("TextLabel")
                 Label.Parent = SubSection
@@ -2831,9 +2773,9 @@ function LexsHub:Window(GuiConfig)
                 Label.Size = UDim2.new(1, -20, 1, 0)
                 Label.BackgroundTransparency = 1
                 Label.Font = Enum.Font.GothamBold
-                Label.Text = title -- Hapus "? ?" biar clean
-                Label.TextColor3 = GuiConfig.Color -- Pake warna dari config
-                Label.TextSize = 14
+                Label.Text = "── [ " .. title .. " ] ──"
+                Label.TextColor3 = Color3.fromRGB(230, 230, 230)
+                Label.TextSize = 12
                 Label.TextXAlignment = Enum.TextXAlignment.Left
 
                 CountItem = CountItem + 1
