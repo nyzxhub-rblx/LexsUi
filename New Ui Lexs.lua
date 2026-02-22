@@ -1,4 +1,4 @@
--- OKE DISINI 5
+-- OKE DISINI 6
 local HttpService = game:GetService("HttpService")
 
 _G.ConfigFolder = _G.ConfigFolder or "LexsHub/Config/"
@@ -622,7 +622,7 @@ function LexsHub:Window(GuiConfig)
     ThemeImage.Position = UDim2.new(1, 0, 1, 0)
     ThemeImage.Size = UDim2.new(0.55, 0, 1.0, 0) -- ga terlalu gede
     ThemeImage.ZIndex = 0
-    ThemeImage.Image = "rbxassetid://14835376820"
+    ThemeImage.Image = "rbxassetid://16787098319"
     ThemeImage.ImageTransparency = 0.45
     ThemeImage.ScaleType = Enum.ScaleType.Fit
 
