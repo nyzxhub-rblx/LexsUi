@@ -1,4 +1,4 @@
-local HttpService = game:GetService("HttpService") -- V0.0.2
+local HttpService = game:GetService("HttpService") -- V0.0.3
 
 if not isfolder("LexsHub") then
     makefolder("LexsHub")
@@ -602,7 +602,7 @@ function LexsHub:Window(GuiConfig)
     ThemeImage.Position = UDim2.new(1, 0, 1, 0)
     ThemeImage.Size = UDim2.new(0.55, 0, 1.0, 0) -- ga terlalu gede
     ThemeImage.ZIndex = 0
-    ThemeImage.Image = "rbxassetid://75650154710506"
+    ThemeImage.Image = "rbxassetid://136032771498200"
     ThemeImage.ImageTransparency = 0.45
     ThemeImage.ScaleType = Enum.ScaleType.Fit
 
