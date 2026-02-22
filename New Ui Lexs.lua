@@ -361,7 +361,7 @@ function LexsHub:MakeNotify(NotifyConfig)
         UIStroke.Thickness = 1
         UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-        LeftIcon.Image = "rbxassetid://99236135648613"
+        LeftIcon.Image = "rbxassetid://17495379799"
         LeftIcon.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
         LeftIcon.BackgroundTransparency = 0
         LeftIcon.BorderSizePixel = 0
@@ -596,15 +596,6 @@ function LexsHub:Window(GuiConfig)
     Top.Size = UDim2.new(1, 0, 0, 38)
     Top.Name = "Top"
     Top.Parent = Main
-
-    TitleIcon.Name = "TitleIcon"
-    TitleIcon.Parent = Top
-    TitleIcon.BackgroundTransparency = 1
-    TitleIcon.BorderSizePixel = 0
-    TitleIcon.AnchorPoint = Vector2.new(0, 0.5)
-    TitleIcon.Position = UDim2.new(0, 10, 0.5, 0) 
-    TitleIcon.Size = UDim2.new(0, 20, 0, 20)
-    TitleIcon.Image = GuiConfig.Icon
 
     local ImageWrapper = Instance.new("Frame")
     ImageWrapper.Name = "ImageWrapper"
