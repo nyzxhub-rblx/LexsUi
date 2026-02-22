@@ -1,4 +1,4 @@
-local HttpService = game:GetService("HttpService") -- V0.0.4
+local HttpService = game:GetService("HttpService") -- V0.0.5
 
 if not isfolder("LexsHub") then
     makefolder("LexsHub")
@@ -54,6 +54,7 @@ end
 
 local Icons = {
     lexshub   = "rbxassetid://71947103252559",
+    lexshub2   = "rbxassetid://103875081318049",
     player    = "rbxassetid://12120698352",
     web       = "rbxassetid://137601480983962",
     bag       = "rbxassetid://8601111810",
@@ -560,12 +561,6 @@ function LexsHub:Window(GuiConfig)
     Main.Size = UDim2.new(1, -47, 1, -47)
     Main.Name = "Main"
     Main.Parent = DropShadow
-
-    MainStroke.Thickness = 1.2
-    MainStroke.Color = Color3.fromRGB(189, 162, 241)
-    MainStroke.Transparency = 0.6
-    MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    MainStroke.Parent = Main
 
     UICorner.Parent = Main
 
