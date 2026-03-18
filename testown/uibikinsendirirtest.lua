@@ -2965,6 +2965,60 @@ end
                 AutoSave = data.AutoSave or true,
                 FileSaveName = data.FileSaveName or "Configo.json", -- wajib ada .json
 			}
+
+            -- function typing title
+	local function TypeTitle(label, text, speed)
+
+		speed = speed or 0.03
+		label.Text = ""
+
+		task.spawn(function()
+
+			-- efek mengetik
+			for i = 1, #text do
+				label.Text = string.sub(text,1,i)
+				task.wait(speed)
+			end
+
+			-- cursor blink
+			local cursor = true
+
+			while true do
+				if cursor then
+					label.Text = text.."|"
+				else
+					label.Text = text
+				end
+
+				cursor = not cursor
+				task.wait(0.5)
+			end
+
+		end)
+
+	end
+
+
+	-- buat window
+	local newWindow = oldWindow:Clone()
+	local TopFrame = newWindow.TopFrame
+
+	newWindow.Name = Window.Title
+
+
+	-- title yang akan diketik
+	local FullTitle = Window.Title.." - "..Window.Version
+
+	TypeTitle(TopFrame.TextLabel, FullTitle, 0.03)
+
+
+	newWindow.Size = Window.Size
+	newWindow.Visible = false
+	newWindow.Parent = Gui
+
+	return Window
+end
+
             local CONFIG = {}
             local CONFIGLOADED = false
 
