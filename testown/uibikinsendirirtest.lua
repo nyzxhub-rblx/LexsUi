@@ -2927,22 +2927,26 @@ NatHub_MODULES[NatHub["3e"]] = {
 		local Windows = {}
         local function TypeTitle(label, text, speed)
 
+    speed = speed or 0.03
     label.Text = ""
 
     task.spawn(function()
 
-        -- efek mengetik
+        -- mengetik
         for i = 1, #text do
             label.Text = string.sub(text,1,i)
-            task.wait(speed or 0.03)
+            task.wait(speed)
         end
 
         -- cursor blink
+        local cursor = true
         while true do
-            label.Text = text.."|"
-            task.wait(0.5)
-
-            label.Text = text
+            if cursor then
+                label.Text = text.."|"
+            else
+                label.Text = text
+            end
+            cursor = not cursor
             task.wait(0.5)
         end
 
@@ -3009,7 +3013,7 @@ end
 			local Tabs = mainFrame.Tabs
 
 			newWindow.Name = Window.Title
-			local FullTitle = Window.Title.." - "..Window.Version
+            local FullTitle = Window.Title.." - "..Window.Version
             TypeTitle(TopFrame.TextLabel, FullTitle, 0.03)
 			if not Window.Icon:find("rbxassetid") then
 				TopFrame.Icon.Image = IconModule.Icon(Window.Icon)[1] or Window.Icon or ""
