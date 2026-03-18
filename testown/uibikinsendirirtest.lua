@@ -1,4 +1,4 @@
--- OKE DISINI 6
+-- OKE DISINI 7
 local HttpService = game:GetService("HttpService")
 
 _G.ConfigFolder = _G.ConfigFolder or "LexsHub/Config/"
