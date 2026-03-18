@@ -1,16 +1,10 @@
 --[[
-	_   _       _   _    _ _____ 
-	| \ | |     | | | |  | |_   _|
-	|  \| | __ _| |_| |  | | | |  
-	| . ` |/ _` | __| |  | | | |  
-	| |\  | (_| | |_| |__| |_| |_ 
-	|_| \_|\__,_|\__|\____/|_____|
 
     Rewrited from Wind UI (Footagesus)
     Github: https://github.com/Footagesus/WindUI
 
 	Developed by: .chill.z. (Chillz)
-	Owned by: ardyxz (NatHub)
+	Owned by: Lexs
 
 	This User Interface is open source and for public usage.
 ]]
@@ -2932,21 +2926,21 @@ NatHub_MODULES[NatHub["3e"]] = {
 
     task.spawn(function()
 
-        -- mengetik
+        local typed = ""
+
+        -- efek mengetik
         for i = 1, #text do
-            label.Text = string.sub(text,1,i)
+            typed = typed .. text:sub(i,i)
+            label.Text = typed
             task.wait(speed)
         end
 
         -- cursor blink
-        local cursor = true
         while true do
-            if cursor then
-                label.Text = text.."|"
-            else
-                label.Text = text
-            end
-            cursor = not cursor
+            label.Text = typed.."|"
+            task.wait(0.5)
+
+            label.Text = typed
             task.wait(0.5)
         end
 
@@ -2965,59 +2959,6 @@ end
                 AutoSave = data.AutoSave or true,
                 FileSaveName = data.FileSaveName or "Configo.json", -- wajib ada .json
 			}
-
-            -- function typing title
-	local function TypeTitle(label, text, speed)
-
-		speed = speed or 0.03
-		label.Text = ""
-
-		task.spawn(function()
-
-			-- efek mengetik
-			for i = 1, #text do
-				label.Text = string.sub(text,1,i)
-				task.wait(speed)
-			end
-
-			-- cursor blink
-			local cursor = true
-
-			while true do
-				if cursor then
-					label.Text = text.."|"
-				else
-					label.Text = text
-				end
-
-				cursor = not cursor
-				task.wait(0.5)
-			end
-
-		end)
-
-	end
-
-
-	-- buat window
-	local newWindow = oldWindow:Clone()
-	local TopFrame = newWindow.TopFrame
-
-	newWindow.Name = Window.Title
-
-
-	-- title yang akan diketik
-	local FullTitle = Window.Title.." - "..Window.Version
-
-	TypeTitle(TopFrame.TextLabel, FullTitle, 0.03)
-
-
-	newWindow.Size = Window.Size
-	newWindow.Visible = false
-	newWindow.Parent = Gui
-
-	return Window
-end
 
             local CONFIG = {}
             local CONFIGLOADED = false
