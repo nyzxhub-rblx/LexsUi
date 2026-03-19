@@ -1,4 +1,4 @@
--- // Version : 0.2.1 | ConfigSection | Main.lua
+-- // Version : 0.2.2 | ConfigSection | Main.lua
 
 local HttpService = game:GetService("HttpService") 
 local Players     = game:GetService("Players")
@@ -293,48 +293,44 @@ end
 local function _MakeColorPicker(Config, SectionAdd, CountItem, AccentColor, MainDropShadow)
     _InitColorpicker(AccentColor, MainDropShadow)
     if not _ColorpickerModule then
-        warn("[LexsUI] Colorpicker.lua gagal dimuat dari server")
+        warn("[LexsHub] Colorpicker.lua gagal dimuat dari server")
         return {}
     end
     return _ColorpickerModule.MakeColorPicker(Config, SectionAdd, CountItem, AccentColor, MainDropShadow)
 end
 
-local LexsUI = {}
-
-function LexsUI:MakeNotify(NotifyConfig)
-    NotifyConfig = NotifyConfig or {}
-    NotifyConfig.Title       = NotifyConfig.Title or "Lexs Hub"
+local LexsHub = {}
+function LexsHub:MakeNotify(NotifyConfig)
+    local NotifyConfig = NotifyConfig or {}
+    NotifyConfig.Title = NotifyConfig.Title or "Lexs Hub"
     NotifyConfig.Description = NotifyConfig.Description or "Notification"
-    NotifyConfig.Content     = NotifyConfig.Content or "Content"
-    NotifyConfig.Color       = getColor(NotifyConfig.Color or Color3.fromRGB(0, 208, 255))
-    NotifyConfig.Time        = NotifyConfig.Time or 0.5
-    NotifyConfig.Delay       = NotifyConfig.Delay or 5
-
+    NotifyConfig.Content = NotifyConfig.Content or "Content"
+    NotifyConfig.Color = NotifyConfig.Color or Color3.fromRGB(0, 255, 255)
+    NotifyConfig.Time = NotifyConfig.Time or 0.5
+    NotifyConfig.Delay = NotifyConfig.Delay or 5
     local NotifyFunction = {}
-
     spawn(function()
         if not CoreGui:FindFirstChild("NotifyGui") then
-            local NotifyGui = Instance.new("ScreenGui")
+            local NotifyGui = Instance.new("ScreenGui");
             NotifyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
             NotifyGui.Name = "NotifyGui"
             NotifyGui.Parent = CoreGui
         end
-
         if not CoreGui.NotifyGui:FindFirstChild("NotifyLayout") then
-            local NotifyLayout = Instance.new("Frame")
+            local NotifyLayout = Instance.new("Frame");
             NotifyLayout.AnchorPoint = Vector2.new(1, 1)
             NotifyLayout.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            NotifyLayout.BackgroundTransparency = 0.999
+            NotifyLayout.BackgroundTransparency = 0.9990000128746033
+            NotifyLayout.BorderColor3 = Color3.fromRGB(0, 0, 0)
             NotifyLayout.BorderSizePixel = 0
             NotifyLayout.Position = UDim2.new(1, -30, 1, -30)
             NotifyLayout.Size = UDim2.new(0, 320, 1, 0)
             NotifyLayout.Name = "NotifyLayout"
             NotifyLayout.Parent = CoreGui.NotifyGui
-
             local Count = 0
             CoreGui.NotifyGui.NotifyLayout.ChildRemoved:Connect(function()
                 Count = 0
-                for _, v in CoreGui.NotifyGui.NotifyLayout:GetChildren() do
+                for i, v in CoreGui.NotifyGui.NotifyLayout:GetChildren() do
                     TweenService:Create(
                         v,
                         TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
@@ -344,48 +340,49 @@ function LexsUI:MakeNotify(NotifyConfig)
                 end
             end)
         end
-
         local NotifyPosHeigh = 0
-        for _, v in CoreGui.NotifyGui.NotifyLayout:GetChildren() do
+        for i, v in CoreGui.NotifyGui.NotifyLayout:GetChildren() do
             NotifyPosHeigh = -(v.Position.Y.Offset) + v.Size.Y.Offset + 12
         end
+        local NotifyFrame = Instance.new("Frame");
+        local NotifyFrameReal = Instance.new("Frame");
+        local UICorner = Instance.new("UICorner");
+        local UIStroke = Instance.new("UIStroke");
+        local LeftIcon = Instance.new("ImageLabel");
+        local LeftIconCorner = Instance.new("UICorner");
+        local ContentFrame = Instance.new("Frame");
+        local Top = Instance.new("Frame");
+        local TextLabel = Instance.new("TextLabel");
+        local TextLabel1 = Instance.new("TextLabel");
+        local Close = Instance.new("TextButton");
+        local ImageLabel = Instance.new("ImageLabel");
+        local TextLabel2 = Instance.new("TextLabel");
 
-        local NotifyFrame     = Instance.new("Frame")
-        local NotifyFrameReal = Instance.new("Frame")
-        local UICorner        = Instance.new("UICorner")
-        local UIStroke        = Instance.new("UIStroke")
-        local LeftIcon        = Instance.new("ImageLabel")
-        local LeftIconCorner  = Instance.new("UICorner")
-        local ContentFrame    = Instance.new("Frame")
-        local Top             = Instance.new("Frame")
-        local TitleLabel      = Instance.new("TextLabel")
-        local DescLabel       = Instance.new("TextLabel")
-        local Close           = Instance.new("TextButton")
-        local CloseImg        = Instance.new("ImageLabel")
-        local ContentLabel    = Instance.new("TextLabel")
-
-        NotifyFrame.BackgroundTransparency = 1
+        NotifyFrame.BackgroundColor3 = Color3.fromRGB(29, 30, 35)
+        NotifyFrame.BorderColor3 = Color3.fromRGB(29, 30, 35)
         NotifyFrame.BorderSizePixel = 0
-        NotifyFrame.Size = UDim2.new(1, 0, 0, 70)
+        NotifyFrame.Size = UDim2.new(1, 0, 0, 150)
         NotifyFrame.Name = "NotifyFrame"
-        NotifyFrame.AnchorPoint = Vector2.new(0, 1)
-        NotifyFrame.Position = UDim2.new(0, 0, 1, -NotifyPosHeigh)
+        NotifyFrame.BackgroundTransparency = 1
         NotifyFrame.Parent = CoreGui.NotifyGui.NotifyLayout
+        NotifyFrame.AnchorPoint = Vector2.new(0, 1)
+        NotifyFrame.Position = UDim2.new(0, 0, 1, -(NotifyPosHeigh))
 
         NotifyFrameReal.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+        NotifyFrameReal.BorderColor3 = Color3.fromRGB(0, 0, 0)
         NotifyFrameReal.BorderSizePixel = 0
         NotifyFrameReal.Position = UDim2.new(0, 400, 0, 0)
         NotifyFrameReal.Size = UDim2.new(1, 0, 1, 0)
         NotifyFrameReal.Name = "NotifyFrameReal"
         NotifyFrameReal.Parent = NotifyFrame
 
-        UICorner.CornerRadius = UDim.new(0, 10)
         UICorner.Parent = NotifyFrameReal
-
+        UICorner.CornerRadius = UDim.new(0, 10)
+        
+        UIStroke.Parent = NotifyFrameReal
         UIStroke.Color = Color3.fromRGB(40, 40, 45)
         UIStroke.Thickness = 1
         UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        UIStroke.Parent = NotifyFrameReal
 
         LeftIcon.Image = "rbxassetid://17495379799"
         LeftIcon.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
@@ -399,39 +396,41 @@ function LexsUI:MakeNotify(NotifyConfig)
         LeftIconCorner.Parent = LeftIcon
         LeftIconCorner.CornerRadius = UDim.new(0, 10)
 
-        local contentX = hasIcon and 55 or 0
+        ContentFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
         ContentFrame.BackgroundTransparency = 1
         ContentFrame.BorderSizePixel = 0
-        ContentFrame.Position = UDim2.new(0, contentX, 0, 0)
-        ContentFrame.Size = UDim2.new(1, -contentX, 1, 0)
+        ContentFrame.Position = UDim2.new(0, 55, 0, 0)
+        ContentFrame.Size = UDim2.new(1, -55, 1, 0)
         ContentFrame.Name = "ContentFrame"
         ContentFrame.Parent = NotifyFrameReal
 
+        Top.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
         Top.BackgroundTransparency = 1
+        Top.BorderColor3 = Color3.fromRGB(0, 0, 0)
         Top.BorderSizePixel = 0
         Top.Size = UDim2.new(1, 0, 0, 36)
         Top.Name = "Top"
         Top.Parent = ContentFrame
 
-        TitleLabel.Font = Enum.Font.GothamBold
-        TitleLabel.Text = NotifyConfig.Title
-        TitleLabel.TextColor3 = Color3.fromRGB(240, 240, 245)
-        TitleLabel.TextSize = 14
-        TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-        TitleLabel.BackgroundTransparency = 1
-        TitleLabel.Size = UDim2.new(1, -50, 1, 0)
-        TitleLabel.Position = UDim2.new(0, 10, 0, 0)
-        TitleLabel.Parent = Top
+        TextLabel.Font = Enum.Font.GothamBold
+        TextLabel.Text = NotifyConfig.Title
+        TextLabel.TextColor3 = Color3.fromRGB(240, 240, 245)
+        TextLabel.TextSize = 14
+        TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+        TextLabel.BackgroundTransparency = 1
+        TextLabel.Size = UDim2.new(1, -50, 1, 0)
+        TextLabel.Parent = Top
+        TextLabel.Position = UDim2.new(0, 10, 0, 0)
 
-        DescLabel.Font = Enum.Font.GothamMedium
-        DescLabel.Text = NotifyConfig.Description
-        DescLabel.TextColor3 = NotifyConfig.Color
-        DescLabel.TextSize = 13
-        DescLabel.TextXAlignment = Enum.TextXAlignment.Left
-        DescLabel.BackgroundTransparency = 1
-        DescLabel.Size = UDim2.new(1, 0, 1, 0)
-        DescLabel.Position = UDim2.new(0, TitleLabel.TextBounds.X + 15, 0, 0)
-        DescLabel.Parent = Top
+        TextLabel1.Font = Enum.Font.GothamMedium
+        TextLabel1.Text = NotifyConfig.Description
+        TextLabel1.TextColor3 = NotifyConfig.Color
+        TextLabel1.TextSize = 13
+        TextLabel1.TextXAlignment = Enum.TextXAlignment.Left
+        TextLabel1.BackgroundTransparency = 1
+        TextLabel1.Size = UDim2.new(1, 0, 1, 0)
+        TextLabel1.Position = UDim2.new(0, TextLabel.TextBounds.X + 15, 0, 0)
+        TextLabel1.Parent = Top
 
         Close.Text = ""
         Close.AnchorPoint = Vector2.new(1, 0.5)
@@ -441,36 +440,39 @@ function LexsUI:MakeNotify(NotifyConfig)
         Close.Name = "Close"
         Close.Parent = Top
 
-        CloseImg.Image = "rbxassetid://9886659671"
-        CloseImg.ImageColor3 = Color3.fromRGB(160, 160, 165)
-        CloseImg.AnchorPoint = Vector2.new(0.5, 0.5)
-        CloseImg.BackgroundTransparency = 1
-        CloseImg.Position = UDim2.new(0.5, 0, 0.5, 0)
-        CloseImg.Size = UDim2.new(0.7, 0, 0.7, 0)
-        CloseImg.Parent = Close
+        ImageLabel.Image = "rbxassetid://9886659671"
+        ImageLabel.ImageColor3 = Color3.fromRGB(160, 160, 165)
+        ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+        ImageLabel.BackgroundTransparency = 1
+        ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+        ImageLabel.Size = UDim2.new(0.7, 0, 0.7, 0)
+        ImageLabel.Parent = Close
 
-        ContentLabel.Font = Enum.Font.Gotham
-        ContentLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
-        ContentLabel.TextSize = 13
-        ContentLabel.Text = NotifyConfig.Content
-        ContentLabel.TextXAlignment = Enum.TextXAlignment.Left
-        ContentLabel.TextYAlignment = Enum.TextYAlignment.Top
-        ContentLabel.BackgroundTransparency = 1
-        ContentLabel.Position = UDim2.new(0, 10, 0, 30)
-        ContentLabel.Size = UDim2.new(1, -20, 0, 13)
-        ContentLabel.TextWrapped = true
-        ContentLabel.Parent = ContentFrame
-        ContentLabel.Size = UDim2.new(1, -20, 0, 13 + (13 * (ContentLabel.TextBounds.X // ContentLabel.AbsoluteSize.X)))
+        TextLabel2.Font = Enum.Font.Gotham
+        TextLabel2.TextColor3 = Color3.fromRGB(160, 160, 165)
+        TextLabel2.TextSize = 13
+        TextLabel2.Text = NotifyConfig.Content
+        TextLabel2.TextXAlignment = Enum.TextXAlignment.Left
+        TextLabel2.TextYAlignment = Enum.TextYAlignment.Top
+        TextLabel2.BackgroundTransparency = 1
+        TextLabel2.Position = UDim2.new(0, 10, 0, 30)
+        TextLabel2.Parent = ContentFrame
+        TextLabel2.Size = UDim2.new(1, -20, 0, 13)
 
-        if ContentLabel.AbsoluteSize.Y < 27 then
+        TextLabel2.Size = UDim2.new(1, -20, 0, 13 + (13 * (TextLabel2.TextBounds.X // TextLabel2.AbsoluteSize.X)))
+        TextLabel2.TextWrapped = true
+
+        if TextLabel2.AbsoluteSize.Y < 27 then
             NotifyFrame.Size = UDim2.new(1, 0, 0, 70)
         else
-            NotifyFrame.Size = UDim2.new(1, 0, 0, ContentLabel.AbsoluteSize.Y + 43)
+            NotifyFrame.Size = UDim2.new(1, 0, 0, TextLabel2.AbsoluteSize.Y + 43)
         end
-
+        
         local waitbruh = false
         function NotifyFunction:Close()
-            if waitbruh then return false end
+            if waitbruh then
+                return false
+            end
             waitbruh = true
             TweenService:Create(
                 NotifyFrameReal,
@@ -484,37 +486,36 @@ function LexsUI:MakeNotify(NotifyConfig)
         Close.Activated:Connect(function()
             NotifyFunction:Close()
         end)
-
+        
         TweenService:Create(
             NotifyFrameReal,
             TweenInfo.new(tonumber(NotifyConfig.Time), Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
             { Position = UDim2.new(0, 0, 0, 0) }
         ):Play()
-
+        
         task.wait(tonumber(NotifyConfig.Delay))
         NotifyFunction:Close()
     end)
-
     return NotifyFunction
 end
 
-function lexs(msg, delay, color, title, desc)
-    return LexsUI:MakeNotify({
-        Title       = title or "Lexs Hub",
+function Lexs(msg, delay, color, title, desc)
+    return LexsHub:MakeNotify({
+        Title = title or "Lexs Hub",
         Description = desc or "Notification",
-        Content     = msg or "Content",
-        Color       = color or Color3.fromRGB(0, 208, 255),
-        Delay       = delay or 4,
+        Content = msg or "Content",
+        Color = color or Color3.fromRGB(0, 255, 255),
+        Delay = delay or 4
     })
 end
 
 Notify = lexs
 
-function LexsUI:Dialog(DialogConfig)
+function LexsHub:Dialog(DialogConfig)
     return DialogModule(DialogConfig)
 end
 
-function LexsUI:AddConfigSection(Tab, SectionConfig)
+function LexsHub:AddConfigSection(Tab, SectionConfig)
     local sectionName, sectionIcon
     if type(SectionConfig) == "string" then
         sectionName = SectionConfig
@@ -772,7 +773,7 @@ function LexsUI:AddConfigSection(Tab, SectionConfig)
     return Sections
 end
 
-function LexsUI:Window(GuiConfig)
+function LexsHub:Window(GuiConfig)
     GuiConfig               = GuiConfig or {}
     GuiConfig.Title         = GuiConfig.Title or "Lexs Hub"
     GuiConfig.Footer        = GuiConfig.Footer or "Lexs"
@@ -1843,7 +1844,7 @@ function LexsUI:Window(GuiConfig)
 
     Close.Activated:Connect(function()
         CircleClick(Close, Mouse.X, Mouse.Y)
-        LexsUI:Dialog({
+        LexsHub:Dialog({
             Title = GuiConfig.Configname .. " Window",
             Content = "Do you want to close this window?\nYou will not be able to open it again",
             Buttons = {
@@ -2131,7 +2132,7 @@ function LexsUI:Window(GuiConfig)
                 end
 
                 if not sa then
-                    warn("[LexsUI] AddColorpicker: tidak bisa deteksi parent section.")
+                    warn("[LexsHub] AddColorpicker: tidak bisa deteksi parent section.")
                     return {}
                 end
 
@@ -2149,6 +2150,6 @@ function LexsUI:Window(GuiConfig)
     return GuiFunc
 end
 
-LexsUI = Lexs
+LexsHub = Lexs
 
 return Lexs
