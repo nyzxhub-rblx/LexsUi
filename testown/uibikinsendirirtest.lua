@@ -303,7 +303,7 @@ local LexsUI = {}
 
 function LexsUI:MakeNotify(NotifyConfig)
     NotifyConfig = NotifyConfig or {}
-    NotifyConfig.Title       = NotifyConfig.Title or "Lexs UI"
+    NotifyConfig.Title       = NotifyConfig.Title or "Lexs Hub"
     NotifyConfig.Description = NotifyConfig.Description or "Notification"
     NotifyConfig.Content     = NotifyConfig.Content or "Content"
     NotifyConfig.Color       = getColor(NotifyConfig.Color or Color3.fromRGB(0, 208, 255))
@@ -387,21 +387,17 @@ function LexsUI:MakeNotify(NotifyConfig)
         UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
         UIStroke.Parent = NotifyFrameReal
 
-        local iconId = getIconId(NotifyConfig.Icon or "")
-        local hasIcon = iconId ~= ""
-
-        if hasIcon then
-            LeftIcon.Image = iconId
-            LeftIcon.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
-            LeftIcon.BackgroundTransparency = 0
-            LeftIcon.BorderSizePixel = 0
-            LeftIcon.Position = UDim2.new(0, 0, 0, 0)
-            LeftIcon.Size = UDim2.new(0, 55, 1, 0)
-            LeftIcon.ScaleType = Enum.ScaleType.Fit
-            LeftIcon.Parent = NotifyFrameReal
-            LeftIconCorner.CornerRadius = UDim.new(0, 10)
-            LeftIconCorner.Parent = LeftIcon
-        end
+        LeftIcon.Image = "rbxassetid://17495379799"
+        LeftIcon.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
+        LeftIcon.BackgroundTransparency = 0
+        LeftIcon.BorderSizePixel = 0
+        LeftIcon.Position = UDim2.new(0, 0, 0, 0)
+        LeftIcon.Size = UDim2.new(0, 55, 1, 0)
+        LeftIcon.ScaleType = Enum.ScaleType.Fit
+        LeftIcon.Parent = NotifyFrameReal
+        
+        LeftIconCorner.Parent = LeftIcon
+        LeftIconCorner.CornerRadius = UDim.new(0, 10)
 
         local contentX = hasIcon and 55 or 0
         ContentFrame.BackgroundTransparency = 1
