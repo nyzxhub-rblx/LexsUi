@@ -62,7 +62,7 @@ local function getColor(colorInput)
     return ColorModule["Default"] or Color3.fromRGB(0, 208, 255)
 end
 
-local ConfigFolder = "Lexs UI"
+local ConfigFolder = "Lexs Hub"
 local ConfigFile = ""
 local ConfigData = {}
 local Elements = {}
@@ -299,9 +299,9 @@ local function _MakeColorPicker(Config, SectionAdd, CountItem, AccentColor, Main
     return _ColorpickerModule.MakeColorPicker(Config, SectionAdd, CountItem, AccentColor, MainDropShadow)
 end
 
-local LexsHub = {}
+local Chloex = {}
 
-function LexsHub:MakeNotify(NotifyConfig)
+function Chloex:MakeNotify(NotifyConfig)
     NotifyConfig = NotifyConfig or {}
     NotifyConfig.Title       = NotifyConfig.Title or "Lexs Hub"
     NotifyConfig.Description = NotifyConfig.Description or "Notification"
@@ -387,7 +387,7 @@ function LexsHub:MakeNotify(NotifyConfig)
         UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
         UIStroke.Parent = NotifyFrameReal
 
-        local iconId = getIconId(NotifyConfig.Icon or "")
+        local iconId = getIconId(NotifyConfig.Icon or "17495379799")
         local hasIcon = iconId ~= "17495379799"
 
         if hasIcon then
@@ -502,9 +502,9 @@ function LexsHub:MakeNotify(NotifyConfig)
     return NotifyFunction
 end
 
-function lexs(msg, delay, color, title, desc)
-    return LexsHub:MakeNotify({
-        Title       = title or "Lexs Hub",
+function Nt(msg, delay, color, title, desc)
+    return Chloex:MakeNotify({
+        Title       = title or ConfigFolder,
         Description = desc or "Notification",
         Content     = msg or "Content",
         Color       = color or Color3.fromRGB(0, 208, 255),
@@ -512,13 +512,13 @@ function lexs(msg, delay, color, title, desc)
     })
 end
 
-Notify = lexs
+Notify = Nt
 
-function LexsHub:Dialog(DialogConfig)
+function Chloex:Dialog(DialogConfig)
     return DialogModule(DialogConfig)
 end
 
-function LexsHub:AddConfigSection(Tab, SectionConfig)
+function Chloex:AddConfigSection(Tab, SectionConfig)
     local sectionName, sectionIcon
     if type(SectionConfig) == "string" then
         sectionName = SectionConfig
@@ -776,19 +776,19 @@ function LexsHub:AddConfigSection(Tab, SectionConfig)
     return Sections
 end
 
-function LexsHub:Window(GuiConfig)
+function Chloex:Window(GuiConfig)
     GuiConfig               = GuiConfig or {}
-    GuiConfig.Title         = GuiConfig.Title or "Lexs Hub"
-    GuiConfig.Footer        = GuiConfig.Footer or "Lexs"
+    GuiConfig.Title         = GuiConfig.Title or "Chloe X"
+    GuiConfig.Footer        = GuiConfig.Footer or "Chloee :3"
     GuiConfig.Content       = GuiConfig.Content or ""
     GuiConfig.ShowUser      = GuiConfig.ShowUser or false
     GuiConfig.Color         = getColor(GuiConfig.Color or "Default")
     GuiConfig["Tab Width"]  = GuiConfig["Tab Width"] or 120
     GuiConfig.Version       = GuiConfig.Version or 1
     GuiConfig.Uitransparent = GuiConfig.Uitransparent or 0.15
-    GuiConfig.Image         = GuiConfig.Image or "103875081318049"
-    GuiConfig.Icon          = GuiConfig.Icon or "rbxassetid://103875081318049
-    GuiConfig.Configname    = GuiConfig.Configname or "Lexs UI"
+    GuiConfig.Image         = GuiConfig.Image or "70884221600423"
+    GuiConfig.Icon          = GuiConfig.Icon or "rbxassetid://103875081318049"
+    GuiConfig.Configname    = GuiConfig.Configname or "Velaris UI"
     GuiConfig.Size          = GuiConfig.Size or UDim2.fromOffset(640, 400)
     GuiConfig.Search        = GuiConfig.Search ~= nil and GuiConfig.Search or false
     GuiConfig.BackgroundVideo = GuiConfig.BackgroundVideo or ""
@@ -1155,7 +1155,7 @@ function LexsHub:Window(GuiConfig)
 
     local GuiFunc = {}
 
-    local Lexsss           = Instance.new("ScreenGui")
+    local Chloeex           = Instance.new("ScreenGui")
     local DropShadowHolder  = Instance.new("Frame")
     local DropShadow        = Instance.new("ImageLabel")
     local Main              = Instance.new("Frame")
@@ -1171,10 +1171,10 @@ function LexsHub:Window(GuiConfig)
     local Min               = Instance.new("TextButton")
     local ImageLabel2       = Instance.new("ImageLabel")
 
-    Lexsss.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    Lexsss.Name = "Lexsss"
-    Lexsss.ResetOnSpawn = false
-    Lexsss.Parent = game:GetService("CoreGui")
+    Chloeex.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    Chloeex.Name = "Chloeex"
+    Chloeex.ResetOnSpawn = false
+    Chloeex.Parent = game:GetService("CoreGui")
 
     DropShadowHolder.BackgroundTransparency = 1
     DropShadowHolder.BorderSizePixel = 0
@@ -1191,11 +1191,11 @@ function LexsHub:Window(GuiConfig)
 
     DropShadowHolder.ZIndex = 0
     DropShadowHolder.Name = "DropShadowHolder"
-    DropShadowHolder.Parent = Lexsss
+    DropShadowHolder.Parent = Chloeex
 
     DropShadowHolder.Position = UDim2.new(
-        0, (Lexsss.AbsoluteSize.X // 2 - DropShadowHolder.Size.X.Offset // 2),
-        0, (Lexsss.AbsoluteSize.Y // 2 - DropShadowHolder.Size.Y.Offset // 2)
+        0, (Chloeex.AbsoluteSize.X // 2 - DropShadowHolder.Size.X.Offset // 2),
+        0, (Chloeex.AbsoluteSize.Y // 2 - DropShadowHolder.Size.Y.Offset // 2)
     )
 
     DropShadow.Image = "rbxassetid://6015897843"
@@ -1266,7 +1266,7 @@ function LexsHub:Window(GuiConfig)
     ThemeImage.Position = UDim2.new(1, 0, 1, 0)
     ThemeImage.Size = UDim2.new(0.55, 0, 1.0, 0)
     ThemeImage.ZIndex = 0
-    ThemeImage.Image = "rbxassetid://4953666718"
+    ThemeImage.Image = ""
     ThemeImage.ImageTransparency = 1
     ThemeImage.ScaleType = Enum.ScaleType.Fit
 
@@ -1715,8 +1715,8 @@ function LexsHub:Window(GuiConfig)
     LayersPageLayout.EasingStyle = Enum.EasingStyle.Quad
 
     function GuiFunc:DestroyGui()
-        if CoreGui:FindFirstChild("Lexsss") then
-            Lexsss:Destroy()
+        if CoreGui:FindFirstChild("Chloeex") then
+            Chloeex:Destroy()
         end
     end
 
@@ -1847,14 +1847,14 @@ function LexsHub:Window(GuiConfig)
 
     Close.Activated:Connect(function()
         CircleClick(Close, Mouse.X, Mouse.Y)
-        LexsHub:Dialog({
+        Chloex:Dialog({
             Title = GuiConfig.Configname .. " Window",
             Content = "Do you want to close this window?\nYou will not be able to open it again",
             Buttons = {
                 {
                     Name = "Yes",
                     Callback = function()
-                        if Lexsss then Lexsss:Destroy() end
+                        if Chloeex then Chloeex:Destroy() end
                         if GuiFunc._toggleGui then
                             pcall(function() GuiFunc._toggleGui:Destroy() end)
                             GuiFunc._toggleGui = nil
@@ -2153,6 +2153,6 @@ function LexsHub:Window(GuiConfig)
     return GuiFunc
 end
 
-LexsHub = Lexs
+LexsHub = Chloex
 
-return Lexs
+return Chloex
