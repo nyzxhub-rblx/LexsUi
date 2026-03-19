@@ -786,7 +786,7 @@ function LexsUI:Window(GuiConfig)
     GuiConfig["Tab Width"]  = GuiConfig["Tab Width"] or 120
     GuiConfig.Version       = GuiConfig.Version or 1
     GuiConfig.Uitransparent = GuiConfig.Uitransparent or 0.15
-    GuiConfig.Image         = GuiConfig.Image or "4953666718"
+    GuiConfig.Image         = GuiConfig.Image or "103875081318049"
     GuiConfig.Icon          = GuiConfig.Icon or "rbxassetid://103875081318049
     GuiConfig.Configname    = GuiConfig.Configname or "Lexs UI"
     GuiConfig.Size          = GuiConfig.Size or UDim2.fromOffset(640, 400)
@@ -1266,7 +1266,7 @@ function LexsUI:Window(GuiConfig)
     ThemeImage.Position = UDim2.new(1, 0, 1, 0)
     ThemeImage.Size = UDim2.new(0.55, 0, 1.0, 0)
     ThemeImage.ZIndex = 0
-    ThemeImage.Image = ""
+    ThemeImage.Image = "rbxassetid://4953666718"
     ThemeImage.ImageTransparency = 1
     ThemeImage.ScaleType = Enum.ScaleType.Fit
 
