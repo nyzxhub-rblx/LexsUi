@@ -62,7 +62,7 @@ local function getColor(colorInput)
     return ColorModule["Default"] or Color3.fromRGB(0, 208, 255)
 end
 
-local ConfigFolder = "Lexs Hub"
+local ConfigFolder = "Lexs_Hub"
 local ConfigFile = ""
 local ConfigData = {}
 local Elements = {}
@@ -504,7 +504,7 @@ end
 
 function Nt(msg, delay, color, title, desc)
     return Chloex:MakeNotify({
-        Title       = title or ConfigFolder,
+        Title       = title or "Lexs Hub",
         Description = desc or "Notification",
         Content     = msg or "Content",
         Color       = color or Color3.fromRGB(0, 208, 255),
@@ -788,7 +788,7 @@ function Chloex:Window(GuiConfig)
     GuiConfig.Uitransparent = GuiConfig.Uitransparent or 0.15
     GuiConfig.Image         = GuiConfig.Image or "70884221600423"
     GuiConfig.Icon          = GuiConfig.Icon or "rbxassetid://103875081318049"
-    GuiConfig.Configname    = GuiConfig.Configname or "Velaris UI"
+    GuiConfig.Configname    = GuiConfig.Configname or "Lexs Hub"
     GuiConfig.Size          = GuiConfig.Size or UDim2.fromOffset(640, 400)
     GuiConfig.Search        = GuiConfig.Search ~= nil and GuiConfig.Search or false
     GuiConfig.BackgroundVideo = GuiConfig.BackgroundVideo or ""
