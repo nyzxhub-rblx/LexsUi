@@ -1,4 +1,4 @@
--- // Version : 0.2.0 | ConfigSection | Main.lua
+-- // Version : 0.2.1 | ConfigSection | Main.lua
 
 local HttpService = game:GetService("HttpService") 
 local Players     = game:GetService("Players")
@@ -508,7 +508,7 @@ function lexs(msg, delay, color, title, desc)
     })
 end
 
-Notify = Nt
+Notify = lexs
 
 function LexsUI:Dialog(DialogConfig)
     return DialogModule(DialogConfig)
