@@ -1,4 +1,4 @@
--- // Version : 0.2.0 | ConfigSection | Main.lua
+--v2.2
 
 local HttpService = game:GetService("HttpService") 
 local Players     = game:GetService("Players")
@@ -55,14 +55,13 @@ local function getColor(colorInput)
         if ColorModule[colorInput] then
             return ColorModule[colorInput]
         else
-            warn("Color '" .. colorInput .. "' not found, using Default")
             return ColorModule["Default"] or Color3.fromRGB(0, 208, 255)
         end
     end
     return ColorModule["Default"] or Color3.fromRGB(0, 208, 255)
 end
 
-local ConfigFolder = "Lexs_Hub"
+local ConfigFolder = "LexsHub"
 local ConfigFile = ""
 local ConfigData = {}
 local Elements = {}
@@ -275,6 +274,10 @@ function CircleClick(Button, X, Y)
     end)
 end
 
+-- ╔══════════════════════════════════════════════════════════════════╗
+-- ║   FLOATING COLOR PICKER                                         ║
+-- ╚══════════════════════════════════════════════════════════════════╝
+
 local _CPGui          = nil
 local _CPPanel        = nil
 local _CPPanelButtons = nil
@@ -304,11 +307,12 @@ local Chloex = {}
 function Chloex:MakeNotify(NotifyConfig)
     NotifyConfig = NotifyConfig or {}
     NotifyConfig.Title       = NotifyConfig.Title or "Lexs Hub"
-    NotifyConfig.Description = NotifyConfig.Description or "Notification"
-    NotifyConfig.Content     = NotifyConfig.Content or "Content"
+    NotifyConfig.Description = NotifyConfig.Description or ""
+    NotifyConfig.Content     = NotifyConfig.Content or ""
     NotifyConfig.Color       = getColor(NotifyConfig.Color or Color3.fromRGB(0, 208, 255))
     NotifyConfig.Time        = NotifyConfig.Time or 0.5
     NotifyConfig.Delay       = NotifyConfig.Delay or 5
+    NotifyConfig.Buttons     = NotifyConfig.Buttons or {}
 
     local NotifyFunction = {}
 
@@ -323,11 +327,10 @@ function Chloex:MakeNotify(NotifyConfig)
         if not CoreGui.NotifyGui:FindFirstChild("NotifyLayout") then
             local NotifyLayout = Instance.new("Frame")
             NotifyLayout.AnchorPoint = Vector2.new(1, 1)
-            NotifyLayout.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            NotifyLayout.BackgroundTransparency = 0.999
+            NotifyLayout.BackgroundTransparency = 1
             NotifyLayout.BorderSizePixel = 0
-            NotifyLayout.Position = UDim2.new(1, -30, 1, -30)
-            NotifyLayout.Size = UDim2.new(0, 320, 1, 0)
+            NotifyLayout.Position = UDim2.new(1, -16, 1, -16)
+            NotifyLayout.Size = UDim2.new(0, 300, 1, 0)
             NotifyLayout.Name = "NotifyLayout"
             NotifyLayout.Parent = CoreGui.NotifyGui
 
@@ -335,168 +338,265 @@ function Chloex:MakeNotify(NotifyConfig)
             CoreGui.NotifyGui.NotifyLayout.ChildRemoved:Connect(function()
                 Count = 0
                 for _, v in CoreGui.NotifyGui.NotifyLayout:GetChildren() do
-                    TweenService:Create(
-                        v,
-                        TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-                        { Position = UDim2.new(0, 0, 1, -((v.Size.Y.Offset + 12) * Count)) }
-                    ):Play()
-                    Count = Count + 1
+                    if v:IsA("Frame") then
+                        TweenService:Create(v, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
+                            Position = UDim2.new(0, 0, 1, -((v.Size.Y.Offset + 10) * Count))
+                        }):Play()
+                        Count = Count + 1
+                    end
                 end
             end)
         end
 
         local NotifyPosHeigh = 0
         for _, v in CoreGui.NotifyGui.NotifyLayout:GetChildren() do
-            NotifyPosHeigh = -(v.Position.Y.Offset) + v.Size.Y.Offset + 12
+            if v:IsA("Frame") then
+                NotifyPosHeigh = -(v.Position.Y.Offset) + v.Size.Y.Offset + 10
+            end
         end
 
-        local NotifyFrame     = Instance.new("Frame")
-        local NotifyFrameReal = Instance.new("Frame")
-        local UICorner        = Instance.new("UICorner")
-        local UIStroke        = Instance.new("UIStroke")
-        local LeftIcon        = Instance.new("ImageLabel")
-        local LeftIconCorner  = Instance.new("UICorner")
-        local ContentFrame    = Instance.new("Frame")
-        local Top             = Instance.new("Frame")
-        local TitleLabel      = Instance.new("TextLabel")
-        local DescLabel       = Instance.new("TextLabel")
-        local Close           = Instance.new("TextButton")
-        local CloseImg        = Instance.new("ImageLabel")
-        local ContentLabel    = Instance.new("TextLabel")
-
+        local NotifyFrame = Instance.new("Frame")
         NotifyFrame.BackgroundTransparency = 1
         NotifyFrame.BorderSizePixel = 0
         NotifyFrame.Size = UDim2.new(1, 0, 0, 70)
-        NotifyFrame.Name = "NotifyFrame"
         NotifyFrame.AnchorPoint = Vector2.new(0, 1)
         NotifyFrame.Position = UDim2.new(0, 0, 1, -NotifyPosHeigh)
         NotifyFrame.Parent = CoreGui.NotifyGui.NotifyLayout
 
-        NotifyFrameReal.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+        local NotifyFrameReal = Instance.new("Frame")
+        NotifyFrameReal.BackgroundColor3 = Color3.fromRGB(24, 24, 30)
         NotifyFrameReal.BorderSizePixel = 0
-        NotifyFrameReal.Position = UDim2.new(0, 400, 0, 0)
+        NotifyFrameReal.Position = UDim2.new(0, 320, 0, 0)
         NotifyFrameReal.Size = UDim2.new(1, 0, 1, 0)
-        NotifyFrameReal.Name = "NotifyFrameReal"
+        NotifyFrameReal.ClipsDescendants = false
         NotifyFrameReal.Parent = NotifyFrame
+        Instance.new("UICorner", NotifyFrameReal).CornerRadius = UDim.new(0, 10)
 
-        UICorner.CornerRadius = UDim.new(0, 10)
-        UICorner.Parent = NotifyFrameReal
-
-        UIStroke.Color = Color3.fromRGB(40, 40, 45)
-        UIStroke.Thickness = 1
-        UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        UIStroke.Parent = NotifyFrameReal
+        local CardStroke = Instance.new("UIStroke")
+        CardStroke.Color = Color3.fromRGB(50, 50, 62)
+        CardStroke.Thickness = 1
+        CardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        CardStroke.Parent = NotifyFrameReal
 
         local iconId = getIconId(NotifyConfig.Icon or "17495379799")
         local hasIcon = iconId ~= "17495379799"
+        local hasButtons = #NotifyConfig.Buttons > 0
+
+        local titleOffsetX = 12
 
         if hasIcon then
-            LeftIcon.Image = iconId
-            LeftIcon.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
-            LeftIcon.BackgroundTransparency = 0
-            LeftIcon.BorderSizePixel = 0
-            LeftIcon.Position = UDim2.new(0, 0, 0, 0)
-            LeftIcon.Size = UDim2.new(0, 55, 1, 0)
-            LeftIcon.ScaleType = Enum.ScaleType.Fit
-            LeftIcon.Parent = NotifyFrameReal
-            LeftIconCorner.CornerRadius = UDim.new(0, 10)
-            LeftIconCorner.Parent = LeftIcon
+            if hasButtons then
+                local IconImg = Instance.new("ImageLabel")
+                IconImg.BackgroundTransparency = 1
+                IconImg.BorderSizePixel = 0
+                IconImg.AnchorPoint = Vector2.new(0, 0)
+                IconImg.Position = UDim2.new(0, 12, 0, 10)
+                IconImg.Size = UDim2.new(0, 17, 0, 17)
+                IconImg.Image = iconId
+                IconImg.ImageColor3 = Color3.fromRGB(255, 255, 255)
+                IconImg.ScaleType = Enum.ScaleType.Fit
+                IconImg.Parent = NotifyFrameReal
+                titleOffsetX = 12 + 17 + 5
+            else
+                local LeftIcon = Instance.new("ImageLabel")
+                LeftIcon.Image = iconId
+                LeftIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+                LeftIcon.BackgroundColor3 = Color3.fromRGB(28, 28, 34)
+                LeftIcon.BackgroundTransparency = 0
+                LeftIcon.BorderSizePixel = 0
+                LeftIcon.Position = UDim2.new(0, 0, 0, 0)
+                LeftIcon.Size = UDim2.new(0, 50, 1, 0)
+                LeftIcon.ScaleType = Enum.ScaleType.Fit
+                LeftIcon.Parent = NotifyFrameReal
+                Instance.new("UICorner", LeftIcon).CornerRadius = UDim.new(0, 10)
+                titleOffsetX = 58
+            end
         end
 
-        local contentX = hasIcon and 55 or 0
-        ContentFrame.BackgroundTransparency = 1
-        ContentFrame.BorderSizePixel = 0
-        ContentFrame.Position = UDim2.new(0, contentX, 0, 0)
-        ContentFrame.Size = UDim2.new(1, -contentX, 1, 0)
-        ContentFrame.Name = "ContentFrame"
-        ContentFrame.Parent = NotifyFrameReal
-
-        Top.BackgroundTransparency = 1
-        Top.BorderSizePixel = 0
-        Top.Size = UDim2.new(1, 0, 0, 36)
-        Top.Name = "Top"
-        Top.Parent = ContentFrame
-
+        local TitleLabel = Instance.new("TextLabel")
         TitleLabel.Font = Enum.Font.GothamBold
         TitleLabel.Text = NotifyConfig.Title
         TitleLabel.TextColor3 = Color3.fromRGB(240, 240, 245)
-        TitleLabel.TextSize = 14
+        TitleLabel.TextSize = 13
         TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
         TitleLabel.BackgroundTransparency = 1
-        TitleLabel.Size = UDim2.new(1, -50, 1, 0)
-        TitleLabel.Position = UDim2.new(0, 10, 0, 0)
-        TitleLabel.Parent = Top
+        TitleLabel.Position = UDim2.new(0, titleOffsetX, 0, 10)
+        TitleLabel.Size = UDim2.new(1, -titleOffsetX - 10, 0, 16)
+        TitleLabel.Parent = NotifyFrameReal
 
-        DescLabel.Font = Enum.Font.GothamMedium
-        DescLabel.Text = NotifyConfig.Description
-        DescLabel.TextColor3 = NotifyConfig.Color
-        DescLabel.TextSize = 13
-        DescLabel.TextXAlignment = Enum.TextXAlignment.Left
-        DescLabel.BackgroundTransparency = 1
-        DescLabel.Size = UDim2.new(1, 0, 1, 0)
-        DescLabel.Position = UDim2.new(0, TitleLabel.TextBounds.X + 15, 0, 0)
-        DescLabel.Parent = Top
+        local descY = 10
+        if NotifyConfig.Description ~= "" then
+            local DescLabel = Instance.new("TextLabel")
+            DescLabel.Font = Enum.Font.GothamMedium
+            DescLabel.Text = NotifyConfig.Description
+            DescLabel.TextColor3 = NotifyConfig.Color
+            DescLabel.TextSize = 11
+            DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+            DescLabel.BackgroundTransparency = 1
+            DescLabel.Position = UDim2.new(0, titleOffsetX + TitleLabel.TextBounds.X + 6, 0, 11)
+            DescLabel.Size = UDim2.new(1, -(titleOffsetX + TitleLabel.TextBounds.X + 16), 0, 14)
+            DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
+            DescLabel.Parent = NotifyFrameReal
+        end
 
-        Close.Text = ""
-        Close.AnchorPoint = Vector2.new(1, 0.5)
-        Close.BackgroundTransparency = 1
-        Close.Position = UDim2.new(1, -8, 0.5, 0)
-        Close.Size = UDim2.new(0, 24, 0, 24)
-        Close.Name = "Close"
-        Close.Parent = Top
+        local contentY = 30
+        if NotifyConfig.Content ~= "" then
+            local ContentLabel = Instance.new("TextLabel")
+            ContentLabel.Font = Enum.Font.Gotham
+            ContentLabel.TextColor3 = Color3.fromRGB(160, 160, 172)
+            ContentLabel.TextSize = 12
+            ContentLabel.Text = NotifyConfig.Content
+            ContentLabel.TextXAlignment = Enum.TextXAlignment.Left
+            ContentLabel.TextYAlignment = Enum.TextYAlignment.Top
+            ContentLabel.BackgroundTransparency = 1
+            ContentLabel.Position = UDim2.new(0, titleOffsetX, 0, contentY)
+            ContentLabel.Size = UDim2.new(1, -(titleOffsetX + 10), 0, 14)
+            ContentLabel.TextWrapped = true
+            ContentLabel.Parent = NotifyFrameReal
+            local lines_count = math.max(1, math.ceil(ContentLabel.TextBounds.X / math.max(ContentLabel.AbsoluteSize.X, 1)))
+            ContentLabel.Size = UDim2.new(1, -(titleOffsetX + 10), 0, 14 * lines_count)
+            contentY = contentY + 14 * lines_count + 4
+        end
 
+        if hasButtons then
+            local btnAreaY = contentY + 4
+            local gap = 6
+            local btnCount = #NotifyConfig.Buttons
+            local totalGap = gap * (btnCount - 1)
+
+            local BtnRow = Instance.new("Frame")
+            BtnRow.BackgroundTransparency = 1
+            BtnRow.BorderSizePixel = 0
+            BtnRow.Position = UDim2.new(0, 12, 0, btnAreaY)
+            BtnRow.Size = UDim2.new(1, -24, 0, 28)
+            BtnRow.Parent = NotifyFrameReal
+
+            local BtnList = Instance.new("UIListLayout")
+            BtnList.FillDirection = Enum.FillDirection.Horizontal
+            BtnList.HorizontalAlignment = Enum.HorizontalAlignment.Left
+            BtnList.VerticalAlignment = Enum.VerticalAlignment.Center
+            BtnList.Padding = UDim.new(0, gap)
+            BtnList.Parent = BtnRow
+
+            for idx, btnCfg in ipairs(NotifyConfig.Buttons) do
+                local Btn = Instance.new("TextButton")
+                Btn.Font = Enum.Font.GothamBold
+                Btn.TextSize = 11
+                Btn.Text = ""
+                Btn.AutomaticSize = Enum.AutomaticSize.None
+                Btn.Size = UDim2.new(1/btnCount, -(totalGap/btnCount), 1, 0)
+                Btn.BorderSizePixel = 0
+                Btn.LayoutOrder = idx
+
+                local isPrimary = btnCfg.Primary == true
+                if isPrimary then
+                    Btn.BackgroundColor3 = Color3.fromRGB(45, 45, 58)
+                    Btn.TextColor3 = Color3.fromRGB(220, 220, 230)
+                else
+                    Btn.BackgroundColor3 = Color3.fromRGB(33, 33, 42)
+                    Btn.TextColor3 = Color3.fromRGB(160, 160, 175)
+                end
+
+                Instance.new("UICorner", Btn).CornerRadius = UDim.new(1, 0)
+
+                local BtnStroke = Instance.new("UIStroke")
+                BtnStroke.Color = isPrimary and Color3.fromRGB(70, 70, 88) or Color3.fromRGB(50, 50, 62)
+                BtnStroke.Thickness = 1
+                BtnStroke.Parent = Btn
+
+                local BtnInner = Instance.new("Frame")
+                BtnInner.BackgroundTransparency = 1
+                BtnInner.AutomaticSize = Enum.AutomaticSize.X
+                BtnInner.AnchorPoint = Vector2.new(0.5, 0.5)
+                BtnInner.Position = UDim2.new(0.5, 0, 0.5, 0)
+                BtnInner.Size = UDim2.new(0, 0, 1, 0)
+                BtnInner.Parent = Btn
+
+                local BtnInnerList = Instance.new("UIListLayout")
+                BtnInnerList.FillDirection = Enum.FillDirection.Horizontal
+                BtnInnerList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+                BtnInnerList.VerticalAlignment = Enum.VerticalAlignment.Center
+                BtnInnerList.Padding = UDim.new(0, 4)
+                BtnInnerList.Parent = BtnInner
+
+                local btnIconId = getIconId(btnCfg.Icon or "")
+                if btnIconId ~= "" then
+                    local BtnIcon = Instance.new("ImageLabel")
+                    BtnIcon.BackgroundTransparency = 1
+                    BtnIcon.Size = UDim2.new(0, 11, 0, 11)
+                    BtnIcon.Image = btnIconId
+                    BtnIcon.ImageColor3 = isPrimary and Color3.fromRGB(220,220,230) or Color3.fromRGB(160,160,175)
+                    BtnIcon.ScaleType = Enum.ScaleType.Fit
+                    BtnIcon.LayoutOrder = 0
+                    BtnIcon.Parent = BtnInner
+                end
+
+                local BtnLabel = Instance.new("TextLabel")
+                BtnLabel.Font = Enum.Font.GothamBold
+                BtnLabel.Text = btnCfg.Name or ("Btn" .. idx)
+                BtnLabel.TextSize = 11
+                BtnLabel.TextColor3 = isPrimary and Color3.fromRGB(220,220,230) or Color3.fromRGB(160,160,175)
+                BtnLabel.BackgroundTransparency = 1
+                BtnLabel.AutomaticSize = Enum.AutomaticSize.X
+                BtnLabel.Size = UDim2.new(0, 0, 1, 0)
+                BtnLabel.LayoutOrder = 1
+                BtnLabel.Parent = BtnInner
+
+                Btn.Parent = BtnRow
+
+                Btn.MouseButton1Click:Connect(function()
+                    if btnCfg.Callback then pcall(btnCfg.Callback) end
+                    NotifyFunction:Close()
+                end)
+            end
+
+            NotifyFrame.Size = UDim2.new(1, 0, 0, btnAreaY + 28 + 12)
+        else
+            NotifyFrame.Size = UDim2.new(1, 0, 0, contentY + 12)
+        end
+
+        local CloseBtn = Instance.new("TextButton")
+        CloseBtn.Text = ""
+        CloseBtn.AnchorPoint = Vector2.new(1, 0)
+        CloseBtn.BackgroundTransparency = 1
+        CloseBtn.Position = UDim2.new(1, -6, 0, 6)
+        CloseBtn.Size = UDim2.new(0, 18, 0, 18)
+        CloseBtn.Parent = NotifyFrameReal
+
+        local CloseImg = Instance.new("ImageLabel")
         CloseImg.Image = "rbxassetid://9886659671"
-        CloseImg.ImageColor3 = Color3.fromRGB(160, 160, 165)
+        CloseImg.ImageColor3 = Color3.fromRGB(120, 120, 135)
         CloseImg.AnchorPoint = Vector2.new(0.5, 0.5)
         CloseImg.BackgroundTransparency = 1
         CloseImg.Position = UDim2.new(0.5, 0, 0.5, 0)
-        CloseImg.Size = UDim2.new(0.7, 0, 0.7, 0)
-        CloseImg.Parent = Close
-
-        ContentLabel.Font = Enum.Font.Gotham
-        ContentLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
-        ContentLabel.TextSize = 13
-        ContentLabel.Text = NotifyConfig.Content
-        ContentLabel.TextXAlignment = Enum.TextXAlignment.Left
-        ContentLabel.TextYAlignment = Enum.TextYAlignment.Top
-        ContentLabel.BackgroundTransparency = 1
-        ContentLabel.Position = UDim2.new(0, 10, 0, 30)
-        ContentLabel.Size = UDim2.new(1, -20, 0, 13)
-        ContentLabel.TextWrapped = true
-        ContentLabel.Parent = ContentFrame
-        ContentLabel.Size = UDim2.new(1, -20, 0, 13 + (13 * (ContentLabel.TextBounds.X // ContentLabel.AbsoluteSize.X)))
-
-        if ContentLabel.AbsoluteSize.Y < 27 then
-            NotifyFrame.Size = UDim2.new(1, 0, 0, 70)
-        else
-            NotifyFrame.Size = UDim2.new(1, 0, 0, ContentLabel.AbsoluteSize.Y + 43)
-        end
+        CloseImg.Size = UDim2.new(1, 0, 1, 0)
+        CloseImg.Parent = CloseBtn
 
         local waitbruh = false
         function NotifyFunction:Close()
             if waitbruh then return false end
             waitbruh = true
-            TweenService:Create(
-                NotifyFrameReal,
-                TweenInfo.new(tonumber(NotifyConfig.Time), Enum.EasingStyle.Quint, Enum.EasingDirection.In),
-                { Position = UDim2.new(0, 400, 0, 0) }
-            ):Play()
-            task.wait(tonumber(NotifyConfig.Time) / 1.2)
+            TweenService:Create(NotifyFrameReal, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+                Position = UDim2.new(0, 320, 0, 0)
+            }):Play()
+            task.wait(0.3)
             NotifyFrame:Destroy()
         end
 
-        Close.Activated:Connect(function()
+        CloseBtn.Activated:Connect(function() NotifyFunction:Close() end)
+
+        TweenService:Create(NotifyFrameReal, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Position = UDim2.new(0, 0, 0, 0)
+        }):Play()
+
+        local delay = tonumber(NotifyConfig.Delay) or 0
+        if not hasButtons then
+            task.wait(delay)
             NotifyFunction:Close()
-        end)
-
-        TweenService:Create(
-            NotifyFrameReal,
-            TweenInfo.new(tonumber(NotifyConfig.Time), Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-            { Position = UDim2.new(0, 0, 0, 0) }
-        ):Play()
-
-        task.wait(tonumber(NotifyConfig.Delay))
-        NotifyFunction:Close()
+        elseif delay > 0 then
+            task.wait(delay)
+            NotifyFunction:Close()
+        end
     end)
 
     return NotifyFunction
@@ -518,263 +618,26 @@ function Chloex:Dialog(DialogConfig)
     return DialogModule(DialogConfig)
 end
 
-function Chloex:AddConfigSection(Tab, SectionConfig)
-    local sectionName, sectionIcon
-    if type(SectionConfig) == "string" then
-        sectionName = SectionConfig
-        sectionIcon = ""
-    elseif type(SectionConfig) == "table" then
-        sectionName = SectionConfig.Name or "Configuration"
-        sectionIcon = SectionConfig.Icon or ""
-    else
-        sectionName = "Configuration"
-        sectionIcon = ""
+local _ConfigSectionSetup = loadUrl("https://raw.githubusercontent.com/nhfudzfsrzggt/brigida/refs/heads/main/addons/configsection.lua")
+_ConfigSectionSetup(
+    Chloex,
+    function() return ConfigFolder end,
+    function() return CURRENT_VERSION end,
+    function() return ConfigData end,
+    function() return Elements end,
+    LoadConfigElements,
+    SaveConfig,
+    function(msg, delay, color, title, desc)
+        Chloex:MakeNotify({
+            Title       = title or ConfigFolder,
+            Description = desc or "Notification",
+            Content     = msg or "",
+            Color       = color or Color3.fromRGB(0, 208, 255),
+            Delay       = delay or 4,
+        })
     end
+)
 
-    local cfgFolder = ConfigFolder .. "/Config"
-
-    if isfolder and makefolder then
-        if not isfolder(ConfigFolder) then makefolder(ConfigFolder) end
-        if not isfolder(cfgFolder)    then makefolder(cfgFolder)    end
-    end
-
-    local AUTOLOAD_FILE   = ConfigFolder .. "/autoload.txt"
-    local currentAutoload = ""
-    if isfile and isfile(AUTOLOAD_FILE) then
-        pcall(function() currentAutoload = readfile(AUTOLOAD_FILE) end)
-    end
-
-    local function toPath(name)
-        return cfgFolder .. "/" .. name .. ".json"
-    end
-
-    local function getList()
-        local list = {}
-        if not (listfiles and isfolder) then return list end
-        local ok, files = pcall(listfiles, cfgFolder)
-        if not ok then return list end
-        for _, path in ipairs(files) do
-            local n = path:match("([^/\\]+)%.json$")
-            if n then table.insert(list, n) end
-        end
-        table.sort(list)
-        return list
-    end
-
-    local function saveConfig(name)
-        if not writefile then return false end
-        ConfigData._version = CURRENT_VERSION
-        local ok = pcall(writefile, toPath(name), HttpService:JSONEncode(ConfigData))
-        return ok
-    end
-
-    local function loadConfig(name)
-        local path = toPath(name)
-        if not (isfile and isfile(path)) then return false end
-        local ok, data = pcall(function()
-            return HttpService:JSONDecode(readfile(path))
-        end)
-        if ok and type(data) == "table" then
-            if data._version == CURRENT_VERSION then
-                ConfigData = data
-                LoadConfigElements()
-                return true
-            else
-                Nt("Version mismatch on '" .. name .. "'!", 3, Color3.fromRGB(255, 165, 0))
-            end
-        end
-        return false
-    end
-
-    local function deleteConfig(name)
-        local path = toPath(name)
-        if isfile and isfile(path) then
-            pcall(delfile, path)
-            return true
-        end
-        return false
-    end
-
-    local function setAutoload(name)
-        if writefile then
-            pcall(writefile, AUTOLOAD_FILE, name)
-            currentAutoload = name
-        end
-    end
-
-    local function clearAutoload()
-        if isfile and isfile(AUTOLOAD_FILE) then
-            pcall(delfile, AUTOLOAD_FILE)
-        end
-        currentAutoload = ""
-    end
-
-    local Sections = Tab:AddSection({ Title = sectionName, Icon = sectionIcon, Open = true })
-
-    local selectedConfig = nil
-    local dropdownRef    = nil
-    local autoloadLabel  = nil
-
-    local nameInput = Sections:AddInput({
-        Title       = "Config name",
-        Placeholder = "Enter config name...",
-        Default     = "",
-        Flag        = "CHX_ConfigNameInput",
-        Callback    = function() end,
-    })
-
-    Sections:AddButton({
-        Title    = "Create config",
-        Version  = "V2",
-        Icon     = "lucide:file-plus",
-        Callback = function()
-            local raw  = nameInput and nameInput.Value or ""
-            local name = raw:match("^%s*(.-)%s*$"):gsub("[^%w_%-]", "_")
-            if name == "" then
-                Nt("Config name cannot be empty!", 3, Color3.fromRGB(255, 80, 80))
-                return
-            end
-            if saveConfig(name) then
-                Nt("Config '" .. name .. "' created!", 3, Color3.fromRGB(80, 220, 100))
-                if dropdownRef then
-                    dropdownRef:SetValues(getList(), selectedConfig)
-                end
-            else
-                Nt("Failed to create config!", 3, Color3.fromRGB(255, 80, 80))
-            end
-        end,
-    })
-
-    dropdownRef = Sections:AddDropdown({
-        Title    = "Config list",
-        Options  = getList(),
-        Default  = nil,
-        Flag     = "CHX_ConfigListDropdown",
-        Callback = function(val)
-            selectedConfig = val
-        end,
-    })
-
-    Sections:AddButton({
-        Title    = "Load config",
-        Version  = "V2",
-        Icon     = "lucide:folder-open",
-        Callback = function()
-            if not selectedConfig then
-                Nt("Select a config first!", 3, Color3.fromRGB(255, 165, 0))
-                return
-            end
-            if loadConfig(selectedConfig) then
-                Nt("Loaded '" .. selectedConfig .. "'!", 3, Color3.fromRGB(80, 220, 100))
-            else
-                Nt("Failed to load config!", 3, Color3.fromRGB(255, 80, 80))
-            end
-        end,
-    })
-
-    Sections:AddButton({
-        Title    = "Overwrite config",
-        Version  = "V2",
-        Icon     = "lucide:save",
-        Callback = function()
-            if not selectedConfig then
-                Nt("Select a config first!", 3, Color3.fromRGB(255, 165, 0))
-                return
-            end
-            if saveConfig(selectedConfig) then
-                Nt("Overwritten '" .. selectedConfig .. "'!", 3, Color3.fromRGB(80, 220, 100))
-            else
-                Nt("Failed to overwrite config!", 3, Color3.fromRGB(255, 80, 80))
-            end
-        end,
-    })
-
-    Sections:AddButton({
-        Title    = "Delete config",
-        Version  = "V2",
-        Icon     = "lucide:trash-2",
-        Callback = function()
-            if not selectedConfig then
-                Nt("Select a config first!", 3, Color3.fromRGB(255, 165, 0))
-                return
-            end
-            local name = selectedConfig
-            if deleteConfig(name) then
-                if currentAutoload == name then
-                    clearAutoload()
-                    if autoloadLabel then
-                        autoloadLabel:SetContent("none")
-                    end
-                end
-                selectedConfig = nil
-                if dropdownRef then
-                    dropdownRef:SetValues(getList(), nil)
-                end
-                Nt("Deleted '" .. name .. "'!", 3, Color3.fromRGB(80, 220, 100))
-            else
-                Nt("Failed to delete config!", 3, Color3.fromRGB(255, 80, 80))
-            end
-        end,
-    })
-
-    Sections:AddButton({
-        Title    = "Refresh list",
-        Version  = "V2",
-        Icon     = "lucide:refresh-cw",
-        Callback = function()
-            if dropdownRef then
-                dropdownRef:SetValues(getList(), selectedConfig)
-            end
-            Nt("List refreshed!", 2, Color3.fromRGB(80, 180, 255))
-        end,
-    })
-
-    Sections:AddButton({
-        Title    = "Set as autoload",
-        Version  = "V2",
-        Icon     = "lucide:star",
-        Callback = function()
-            if not selectedConfig then
-                Nt("Select a config first!", 3, Color3.fromRGB(255, 165, 0))
-                return
-            end
-            setAutoload(selectedConfig)
-            if autoloadLabel then
-                autoloadLabel:SetContent(selectedConfig)
-            end
-            Nt("Autoload set to '" .. selectedConfig .. "'!", 3, Color3.fromRGB(80, 220, 100))
-        end,
-    })
-
-    Sections:AddButton({
-        Title    = "Reset autoload",
-        Version  = "V2",
-        Icon     = "lucide:star-off",
-        Callback = function()
-            clearAutoload()
-            if autoloadLabel then
-                autoloadLabel:SetContent("none")
-            end
-            Nt("Autoload cleared!", 2, Color3.fromRGB(255, 165, 0))
-        end,
-    })
-
-    autoloadLabel = Sections:AddParagraph({
-        Title   = "Current autoload config",
-        Content = currentAutoload ~= "" and currentAutoload or "none",
-    })
-
-    if currentAutoload ~= "" then
-        task.defer(function()
-            task.wait(0.5)
-            if loadConfig(currentAutoload) then
-                Nt("Auto-loaded: " .. currentAutoload, 3, Color3.fromRGB(80, 220, 100))
-            end
-        end)
-    end
-
-    return Sections
-end
 
 function Chloex:Window(GuiConfig)
     GuiConfig               = GuiConfig or {}
@@ -788,10 +651,16 @@ function Chloex:Window(GuiConfig)
     GuiConfig.Uitransparent = GuiConfig.Uitransparent or 0.15
     GuiConfig.Image         = GuiConfig.Image or "70884221600423"
     GuiConfig.Icon          = GuiConfig.Icon or "rbxassetid://103875081318049"
-    GuiConfig.Configname    = GuiConfig.Configname or "Lexs Hub"
+    GuiConfig.Configname    = GuiConfig.Configname or "LexsHub"
     GuiConfig.Size          = GuiConfig.Size or UDim2.fromOffset(640, 400)
     GuiConfig.Search        = GuiConfig.Search ~= nil and GuiConfig.Search or false
-    GuiConfig.BackgroundVideo = GuiConfig.BackgroundVideo or ""
+
+    -- DiscordSet defaults
+    GuiConfig.DiscordSet        = GuiConfig.DiscordSet or {}
+    GuiConfig.DiscordSet.Enable = GuiConfig.DiscordSet.Enable ~= nil and GuiConfig.DiscordSet.Enable or false
+    GuiConfig.DiscordSet.Title  = GuiConfig.DiscordSet.Title or "DISCORD"
+    GuiConfig.DiscordSet.Link   = GuiConfig.DiscordSet.Link or ""
+    GuiConfig.DiscordSet.Icon   = GuiConfig.DiscordSet.Icon or ""
 
     GuiConfig.Config = GuiConfig.Config or {}
     GuiConfig.Config.AutoSave = GuiConfig.Config.AutoSave ~= nil and GuiConfig.Config.AutoSave or true
@@ -817,339 +686,18 @@ function Chloex:Window(GuiConfig)
 
     local ks = GuiConfig.KeySystem
     if ks then
-        local keyResolved = false
-
-        local KsGui = Instance.new("ScreenGui")
-        KsGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        KsGui.Name = "KeySystemGui"
-        KsGui.ResetOnSpawn = false
-        KsGui.Parent = CoreGui
-
-        local Card = Instance.new("Frame")
-        Card.AnchorPoint = Vector2.new(0.5, 0.5)
-        Card.Position = UDim2.new(0.5, 0, 0.45, 0)
-        Card.Size = UDim2.new(0, 300, 0, 178)
-        Card.BackgroundColor3 = Color3.fromRGB(16, 16, 20)
-        Card.BackgroundTransparency = 1
-        Card.BorderSizePixel = 0
-        Card.ZIndex = 101
-        Card.Parent = KsGui
-
-        local CardCorner = Instance.new("UICorner")
-        CardCorner.CornerRadius = UDim.new(0, 10)
-        CardCorner.Parent = Card
-
-        local CardStroke = Instance.new("UIStroke")
-        CardStroke.Color = Color3.fromRGB(38, 38, 48)
-        CardStroke.Thickness = 1
-        CardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        CardStroke.Parent = Card
-
-        local IconBox = Instance.new("Frame")
-        IconBox.Size = UDim2.new(0, 24, 0, 24)
-        IconBox.Position = UDim2.new(0, 14, 0, 16)
-        IconBox.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
-        IconBox.BorderSizePixel = 0
-        IconBox.ZIndex = 102
-        IconBox.Parent = Card
-        local IconBoxCorner = Instance.new("UICorner")
-        IconBoxCorner.CornerRadius = UDim.new(0, 6)
-        IconBoxCorner.Parent = IconBox
-        local IconBoxStroke = Instance.new("UIStroke")
-        IconBoxStroke.Color = Color3.fromRGB(50, 50, 62)
-        IconBoxStroke.Thickness = 1
-        IconBoxStroke.Parent = IconBox
-
-        local KsIconImg = Instance.new("ImageLabel")
-        KsIconImg.AnchorPoint = Vector2.new(0.5, 0.5)
-        KsIconImg.Position = UDim2.new(0.5, 0, 0.5, 0)
-        KsIconImg.Size = UDim2.new(0, 13, 0, 13)
-        KsIconImg.BackgroundTransparency = 1
-        KsIconImg.BorderSizePixel = 0
-        local ksIconId = getIconId(ks.Icon or "")
-        KsIconImg.Image = (ksIconId ~= "") and ksIconId or "rbxassetid://6031094678"
-        KsIconImg.ImageColor3 = Color3.fromRGB(180, 180, 190)
-        KsIconImg.ScaleType = Enum.ScaleType.Fit
-        KsIconImg.ZIndex = 103
-        KsIconImg.Parent = IconBox
-
-        local KsTitle = Instance.new("TextLabel")
-        KsTitle.Font = Enum.Font.GothamBold
-        KsTitle.Text = ks.Title or GuiConfig.Title or "Key System"
-        KsTitle.TextColor3 = Color3.fromRGB(232, 232, 238)
-        KsTitle.TextSize = 14
-        KsTitle.TextXAlignment = Enum.TextXAlignment.Left
-        KsTitle.BackgroundTransparency = 1
-        KsTitle.BorderSizePixel = 0
-        KsTitle.AnchorPoint = Vector2.new(0, 0.5)
-        KsTitle.Position = UDim2.new(0, 44, 0, 28)
-        KsTitle.Size = UDim2.new(1, -58, 0, 18)
-        KsTitle.ZIndex = 102
-        KsTitle.Parent = Card
-
-        local HDivider = Instance.new("Frame")
-        HDivider.Size = UDim2.new(1, 0, 0, 1)
-        HDivider.Position = UDim2.new(0, 0, 0, 50)
-        HDivider.BackgroundColor3 = Color3.fromRGB(34, 34, 44)
-        HDivider.BorderSizePixel = 0
-        HDivider.ZIndex = 102
-        HDivider.Parent = Card
-
-        local KsNote = Instance.new("TextLabel")
-        KsNote.Font = Enum.Font.Gotham
-        KsNote.Text = ks.Note or ""
-        KsNote.TextColor3 = Color3.fromRGB(95, 95, 108)
-        KsNote.TextSize = 12
-        KsNote.TextXAlignment = Enum.TextXAlignment.Left
-        KsNote.BackgroundTransparency = 1
-        KsNote.BorderSizePixel = 0
-        KsNote.Position = UDim2.new(0, 14, 0, 60)
-        KsNote.Size = UDim2.new(1, -28, 0, 14)
-        KsNote.ZIndex = 102
-        KsNote.Parent = Card
-
-        local InputBg = Instance.new("Frame")
-        InputBg.Position = UDim2.new(0, 14, 0, 84)
-        InputBg.Size = UDim2.new(1, -28, 0, 32)
-        InputBg.BackgroundColor3 = Color3.fromRGB(22, 22, 29)
-        InputBg.BorderSizePixel = 0
-        InputBg.ZIndex = 102
-        InputBg.Parent = Card
-        local InputBgCorner = Instance.new("UICorner")
-        InputBgCorner.CornerRadius = UDim.new(0, 7)
-        InputBgCorner.Parent = InputBg
-        local InputBgStroke = Instance.new("UIStroke")
-        InputBgStroke.Color = Color3.fromRGB(44, 44, 56)
-        InputBgStroke.Thickness = 1
-        InputBgStroke.Parent = InputBg
-
-        local InputIcon = Instance.new("ImageLabel")
-        InputIcon.AnchorPoint = Vector2.new(0, 0.5)
-        InputIcon.Position = UDim2.new(0, 9, 0.5, 0)
-        InputIcon.Size = UDim2.new(0, 13, 0, 13)
-        InputIcon.BackgroundTransparency = 1
-        InputIcon.Image = "rbxassetid://6031094678"
-        InputIcon.ImageColor3 = Color3.fromRGB(75, 75, 88)
-        InputIcon.ScaleType = Enum.ScaleType.Fit
-        InputIcon.ZIndex = 103
-        InputIcon.Parent = InputBg
-
-        local KsInput = Instance.new("TextBox")
-        KsInput.Font = Enum.Font.Gotham
-        KsInput.PlaceholderText = ks.Placeholder or "Enter Key"
-        KsInput.PlaceholderColor3 = Color3.fromRGB(65, 65, 78)
-        KsInput.Text = ks.Default or ""
-        KsInput.TextColor3 = Color3.fromRGB(210, 210, 222)
-        KsInput.TextSize = 12
-        KsInput.TextXAlignment = Enum.TextXAlignment.Left
-        KsInput.BackgroundTransparency = 1
-        KsInput.BorderSizePixel = 0
-        KsInput.ClearTextOnFocus = false
-        KsInput.Position = UDim2.new(0, 28, 0, 0)
-        KsInput.Size = UDim2.new(1, -34, 1, 0)
-        KsInput.ZIndex = 103
-        KsInput.Parent = InputBg
-
-        KsInput.Focused:Connect(function()
-            TweenService:Create(InputBgStroke, TweenInfo.new(0.18), {
-                Color = GuiConfig.Color, Transparency = 0.45
-            }):Play()
+        local ok, result = pcall(function()
+            return loadUrl("https://fitri324.pythonanywhere.com/KeySystemUi.lua/raw")
         end)
-        KsInput.FocusLost:Connect(function()
-            TweenService:Create(InputBgStroke, TweenInfo.new(0.18), {
-                Color = Color3.fromRGB(44, 44, 56), Transparency = 0
-            }):Play()
-        end)
-
-        local BDivider = Instance.new("Frame")
-        BDivider.Size = UDim2.new(1, 0, 0, 1)
-        BDivider.Position = UDim2.new(0, 0, 0, 128)
-        BDivider.BackgroundColor3 = Color3.fromRGB(34, 34, 44)
-        BDivider.BorderSizePixel = 0
-        BDivider.ZIndex = 102
-        BDivider.Parent = Card
-
-        local BtnRow = Instance.new("Frame")
-        BtnRow.BackgroundTransparency = 1
-        BtnRow.BorderSizePixel = 0
-        BtnRow.Position = UDim2.new(0, 14, 0, 136)
-        BtnRow.Size = UDim2.new(1, -28, 0, 30)
-        BtnRow.ZIndex = 102
-        BtnRow.Parent = Card
-
-        local BtnList = Instance.new("UIListLayout")
-        BtnList.FillDirection = Enum.FillDirection.Horizontal
-        BtnList.HorizontalAlignment = Enum.HorizontalAlignment.Right
-        BtnList.VerticalAlignment = Enum.VerticalAlignment.Center
-        BtnList.Padding = UDim.new(0, 6)
-        BtnList.SortOrder = Enum.SortOrder.LayoutOrder
-        BtnList.Parent = BtnRow
-
-        local function ShakeCard()
-            local origPos = Card.Position
-            local offsets = {7, -7, 5, -5, 3, -3, 0}
-            for _, ox in ipairs(offsets) do
-                Card.Position = UDim2.new(
-                    origPos.X.Scale, origPos.X.Offset + ox,
-                    origPos.Y.Scale, origPos.Y.Offset
-                )
-                task.wait(0.04)
+        if not ok or type(result) ~= "function" then
+            warn("[LexsHub] KeySystem gagal dimuat")
+        else
+            local ok2, resolved = pcall(result, ks, GuiConfig, CoreGui, TweenService, getIconId)
+            if not ok2 then
+                warn("[LexsHub] KeySystem error: " .. tostring(resolved))
+            elseif not resolved then
+                while true do task.wait(9999) end
             end
-            Card.Position = origPos
-        end
-
-        local ksClosing = false
-        local function CloseKeySystem()
-            if ksClosing then return end
-            ksClosing = true
-            TweenService:Create(Card, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                Position = UDim2.new(0.5, 0, 0.56, 0),
-                BackgroundTransparency = 1,
-            }):Play()
-            task.delay(0.25, function()
-                pcall(function() KsGui:Destroy() end)
-            end)
-        end
-
-        local buttons = ks.Buttons or {}
-        if #buttons == 0 then
-            buttons = {
-                { Name = "Exit" },
-                { Name = "Submit" },
-            }
-        end
-
-        for i, btnCfg in ipairs(buttons) do
-            local isPrimary = (btnCfg.Style == "primary")
-                or (btnCfg.Name == "Submit")
-                or (i == #buttons)
-
-            local Btn = Instance.new("TextButton")
-            Btn.Font = Enum.Font.GothamBold
-            Btn.Text = ""
-            Btn.AutomaticSize = Enum.AutomaticSize.X
-            Btn.Size = UDim2.new(0, 0, 1, 0)
-            Btn.BorderSizePixel = 0
-            Btn.LayoutOrder = i
-            Btn.ZIndex = 103
-            Btn.Parent = BtnRow
-
-            if isPrimary then
-                Btn.BackgroundColor3 = Color3.fromRGB(50, 50, 62)
-                Btn.BackgroundTransparency = 0
-            else
-                Btn.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
-                Btn.BackgroundTransparency = 0
-            end
-
-            local BtnCorner = Instance.new("UICorner")
-            BtnCorner.CornerRadius = UDim.new(0, 7)
-            BtnCorner.Parent = Btn
-
-            local BtnStroke = Instance.new("UIStroke")
-            BtnStroke.Color = isPrimary and Color3.fromRGB(65, 65, 80) or Color3.fromRGB(44, 44, 56)
-            BtnStroke.Thickness = 1
-            BtnStroke.Parent = Btn
-
-            local BtnPadding = Instance.new("UIPadding")
-            BtnPadding.PaddingLeft  = UDim.new(0, 10)
-            BtnPadding.PaddingRight = UDim.new(0, 10)
-            BtnPadding.Parent = Btn
-
-            local BtnInner = Instance.new("Frame")
-            BtnInner.BackgroundTransparency = 1
-            BtnInner.BorderSizePixel = 0
-            BtnInner.AutomaticSize = Enum.AutomaticSize.X
-            BtnInner.Size = UDim2.new(0, 0, 1, 0)
-            BtnInner.ZIndex = 103
-            BtnInner.Parent = Btn
-
-            local BtnInnerList = Instance.new("UIListLayout")
-            BtnInnerList.FillDirection = Enum.FillDirection.Horizontal
-            BtnInnerList.VerticalAlignment = Enum.VerticalAlignment.Center
-            BtnInnerList.Padding = UDim.new(0, 5)
-            BtnInnerList.Parent = BtnInner
-
-            local iconId = getIconId(btnCfg.Icon or "")
-            if iconId and iconId ~= "" then
-                local BtnIcon = Instance.new("ImageLabel")
-                BtnIcon.BackgroundTransparency = 1
-                BtnIcon.BorderSizePixel = 0
-                BtnIcon.Size = UDim2.new(0, 12, 0, 12)
-                BtnIcon.Image = iconId
-                BtnIcon.ImageColor3 = Color3.fromRGB(180, 180, 195)
-                BtnIcon.ScaleType = Enum.ScaleType.Fit
-                BtnIcon.LayoutOrder = 0
-                BtnIcon.ZIndex = 104
-                BtnIcon.Parent = BtnInner
-            end
-
-            local BtnLabel = Instance.new("TextLabel")
-            BtnLabel.Font = Enum.Font.GothamBold
-            BtnLabel.Text = btnCfg.Name or "Button"
-            BtnLabel.TextColor3 = Color3.fromRGB(195, 195, 208)
-            BtnLabel.TextSize = 12
-            BtnLabel.BackgroundTransparency = 1
-            BtnLabel.BorderSizePixel = 0
-            BtnLabel.AutomaticSize = Enum.AutomaticSize.X
-            BtnLabel.Size = UDim2.new(0, 0, 1, 0)
-            BtnLabel.LayoutOrder = 1
-            BtnLabel.ZIndex = 104
-            BtnLabel.Parent = BtnInner
-
-            local normBg = isPrimary and Color3.fromRGB(50,50,62) or Color3.fromRGB(26,26,34)
-            local hovBg  = isPrimary and Color3.fromRGB(62,62,78) or Color3.fromRGB(34,34,44)
-            Btn.MouseEnter:Connect(function()
-                TweenService:Create(Btn, TweenInfo.new(0.12), { BackgroundColor3 = hovBg }):Play()
-            end)
-            Btn.MouseLeave:Connect(function()
-                TweenService:Create(Btn, TweenInfo.new(0.12), { BackgroundColor3 = normBg }):Play()
-            end)
-
-            Btn.MouseButton1Click:Connect(function()
-                local currentKey = KsInput.Text
-                if btnCfg.Callback then
-                    pcall(function()
-                        local result = btnCfg.Callback(currentKey)
-                        if result == true then
-                            keyResolved = true
-                            CloseKeySystem()
-                        elseif result == false then
-                            TweenService:Create(InputBgStroke, TweenInfo.new(0.1), {
-                                Color = Color3.fromRGB(220, 55, 55), Transparency = 0
-                            }):Play()
-                            task.delay(0.7, function()
-                                TweenService:Create(InputBgStroke, TweenInfo.new(0.3), {
-                                    Color = Color3.fromRGB(44,44,56), Transparency = 0
-                                }):Play()
-                            end)
-                            task.spawn(ShakeCard)
-                        else
-                            local isCloseBtn = btnCfg.Close == true
-                                or btnCfg.Name == "Exit"
-                                or btnCfg.Name == "Close"
-                                or btnCfg.Name == "Cancel"
-                            if isCloseBtn then
-                                CloseKeySystem()
-                            end
-                        end
-                    end)
-                else
-                    CloseKeySystem()
-                end
-            end)
-        end
-
-        TweenService:Create(Card, TweenInfo.new(0.32, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Position = UDim2.new(0.5, 0, 0.5, 0),
-            BackgroundTransparency = 0,
-        }):Play()
-
-        repeat task.wait(0.1) until keyResolved or not KsGui.Parent
-
-        if not keyResolved then
-            pcall(function() KsGui:Destroy() end)
-            return nil
         end
     end
 
@@ -1172,7 +720,7 @@ function Chloex:Window(GuiConfig)
     local ImageLabel2       = Instance.new("ImageLabel")
 
     Chloeex.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    Chloeex.Name = "Chloeex"
+    Chloeex.Name = "LexsHub"
     Chloeex.ResetOnSpawn = false
     Chloeex.Parent = game:GetService("CoreGui")
 
@@ -1280,36 +828,97 @@ function Chloex:Window(GuiConfig)
     })
     ThemeGradient.Parent = ThemeImage
 
-    if GuiConfig.BackgroundVideo ~= "" then
-        local VideoFrame = Instance.new("VideoFrame")
-        VideoFrame.Name = "BackgroundVideo"
-        VideoFrame.Parent = ImageWrapper
-        VideoFrame.BackgroundTransparency = 1
-        VideoFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-        VideoFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-        VideoFrame.Size = UDim2.new(1, 0, 1, 0)
-        VideoFrame.ZIndex = 0
-        VideoFrame.Video = "rbxassetid://" .. GuiConfig.BackgroundVideo
-        VideoFrame.Volume = 0
-        VideoFrame.Looped = true
-        VideoFrame.Playing = true
-        local VideoCorner = Instance.new("UICorner")
-        VideoCorner.CornerRadius = UDim.new(0, 8)
-        VideoCorner.Parent = VideoFrame
-        local VideoGradient = Instance.new("UIGradient")
-        VideoGradient.Rotation = 135
-        VideoGradient.Transparency = NumberSequence.new({
-            NumberSequenceKeypoint.new(0, 0.4),
-            NumberSequenceKeypoint.new(0.5, 0.15),
-            NumberSequenceKeypoint.new(1, 0)
-        })
-        VideoGradient.Parent = VideoFrame
-        VideoFrame:GetPropertyChangedSignal("IsLoaded"):Connect(function()
-            if VideoFrame.IsLoaded then
-                VideoFrame.Playing = true
+    -- ── Background Video ──────────────────────────────────────────────
+    if GuiConfig.BackgroundVideo and GuiConfig.BackgroundVideo ~= "" then
+        task.spawn(function()
+            local videoInput = GuiConfig.BackgroundVideo
+            local videoId    = nil
+
+            local isAssetId = videoInput:match("^%d+$")
+                or videoInput:match("^rbxassetid://")
+
+            if isAssetId then
+                if videoInput:match("^%d+$") then
+                    videoId = "rbxassetid://" .. videoInput
+                else
+                    videoId = videoInput
+                end
+            else
+                local fileName = "LexsHub_bgvideo.webm"
+
+                if writefile and getcustomasset and isfile then
+                    if not isfile(fileName) then
+                        local ok, err = pcall(function()
+                            writefile(fileName, game:HttpGet(videoInput))
+                        end)
+                        if not ok then
+                            return
+                        end
+                    end
+                    local ok2, id = pcall(getcustomasset, fileName)
+                    if ok2 and id then
+                        videoId = id
+                    else
+                        return
+                    end
+                else
+                    warn("[LexsHub] BackgroundVideo: writefile/getcustomasset tidak tersedia")
+                    return
+                end
+            end
+
+            local VideoWrapper = Instance.new("Frame")
+            VideoWrapper.Name = "VideoWrapper"
+            VideoWrapper.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            VideoWrapper.BackgroundTransparency = 0
+            VideoWrapper.BorderSizePixel = 0
+            VideoWrapper.Size = UDim2.fromScale(1, 1)
+            VideoWrapper.Position = UDim2.fromScale(0, 0)
+            VideoWrapper.ZIndex = 0
+            VideoWrapper.ClipsDescendants = true
+            VideoWrapper.Parent = Main
+            Instance.new("UICorner", VideoWrapper).CornerRadius = UDim.new(0, 8)
+
+            local BgVideo = Instance.new("VideoFrame")
+            BgVideo.Name = "BackgroundVideo"
+            BgVideo.Video = videoId
+            BgVideo.Looped = true
+            BgVideo.Volume = 0
+            BgVideo.BackgroundTransparency = 1
+            BgVideo.BorderSizePixel = 0
+            BgVideo.Size = UDim2.fromScale(1, 1)
+            BgVideo.Position = UDim2.fromScale(0, 0)
+            BgVideo.ZIndex = 0
+            BgVideo.Parent = VideoWrapper
+
+            local VideoOverlay = Instance.new("Frame")
+            VideoOverlay.Name = "VideoOverlay"
+            VideoOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            VideoOverlay.BackgroundTransparency = GuiConfig.BackgroundVideoOverlay or 0.4
+            VideoOverlay.BorderSizePixel = 0
+            VideoOverlay.Size = UDim2.fromScale(1, 1)
+            VideoOverlay.ZIndex = 0
+            VideoOverlay.Parent = VideoWrapper
+
+            BgVideo.Loaded:Connect(function()
+                BgVideo:Play()
+            end)
+
+            function GuiFunc:SetBackgroundVideoVolume(Vol)
+                BgVideo.Volume = math.clamp(Vol, 0, 10)
+            end
+            function GuiFunc:PauseBackgroundVideo()
+                BgVideo:Pause()
+            end
+            function GuiFunc:PlayBackgroundVideo()
+                BgVideo:Play()
+            end
+            function GuiFunc:SetBackgroundVideoOverlay(Trans)
+                VideoOverlay.BackgroundTransparency = math.clamp(Trans, 0, 1)
             end
         end)
     end
+    -- ─────────────────────────────────────────────────────────────────
 
     Top.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     Top.BackgroundTransparency = 0.999
@@ -1356,6 +965,47 @@ function Chloex:Window(GuiConfig)
     TextLabel1.Position = UDim2.new(0, 25 + TextLabel.TextBounds.X + 10, 0, 0)
     TextLabel1.Parent = Top
 
+    if GuiConfig.Animation then
+        TextLabel1.Visible = false
+        task.spawn(function()
+            local function typeOut(text, charDelay)
+                TextLabel.Text = ""
+                for i = 1, #text do
+                    TextLabel.Text = string.sub(text, 1, i)
+                    task.wait(charDelay)
+                end
+            end
+
+            local function typeErase(charDelay)
+                local current = TextLabel.Text
+                for i = #current, 1, -1 do
+                    TextLabel.Text = string.sub(current, 1, i - 1)
+                    task.wait(charDelay)
+                end
+                TextLabel.Text = ""
+            end
+
+            local titleText  = GuiConfig.Title
+            local footerText = GuiConfig.Footer
+            local charDelay  = GuiConfig.TypeDelay or 0.07
+            local pauseTime  = GuiConfig.TypePause or 2.5
+
+            while true do
+                typeOut(titleText, charDelay)
+                task.wait(pauseTime)
+                typeErase(charDelay)
+                task.wait(0.15)
+                typeOut(footerText, charDelay)
+                task.wait(pauseTime)
+                typeErase(charDelay)
+                task.wait(0.15)
+            end
+        end)
+    else
+        TextLabel.Text  = GuiConfig.Title
+        TextLabel1.Text = GuiConfig.Footer
+    end
+
     local TagContainer = Instance.new("Frame")
     TagContainer.Name = "TagContainer"
     TagContainer.BackgroundTransparency = 1
@@ -1400,47 +1050,6 @@ function Chloex:Window(GuiConfig)
 
     TextLabel:GetPropertyChangedSignal("TextBounds"):Connect(UpdateFooterPosition)
     UpdateFooterPosition()
-
-    if GuiConfig.Animation then
-        TextLabel1.Visible = false
-        task.spawn(function()
-            local function typeOut(text, charDelay)
-                TextLabel.Text = ""
-                for i = 1, #text do
-                    TextLabel.Text = string.sub(text, 1, i)
-                    task.wait(charDelay)
-                end
-            end
-
-            local function typeErase(charDelay)
-                local current = TextLabel.Text
-                for i = #current, 1, -1 do
-                    TextLabel.Text = string.sub(current, 1, i - 1)
-                    task.wait(charDelay)
-                end
-                TextLabel.Text = ""
-            end
-
-            local titleText = GuiConfig.Title
-            local footerText = GuiConfig.Footer
-            local charDelay = GuiConfig.TypeDelay or 0.07
-            local pauseTime = GuiConfig.TypePause or 2.5
-
-            while true do
-                typeOut(titleText, charDelay)
-                task.wait(pauseTime)
-                typeErase(charDelay)
-                task.wait(0.15)
-                typeOut(footerText, charDelay)
-                task.wait(pauseTime)
-                typeErase(charDelay)
-                task.wait(0.15)
-            end
-        end)
-    else
-        TextLabel.Text  = GuiConfig.Title
-        TextLabel1.Text = GuiConfig.Footer
-    end
 
     Close.Font = Enum.Font.SourceSans
     Close.Text = ""
@@ -1576,12 +1185,141 @@ function Chloex:Window(GuiConfig)
         SearchModule(GuiConfig, LayersTab, LayersFolder, LayersPageLayout, TweenService, searchOffset)
     end
 
+    -- ╔══════════════════════════════════════════════════════════════════╗
+    -- ║  DISCORD BUTTON — independen dari ShowUser                      ║
+    -- ╚══════════════════════════════════════════════════════════════════╝
+    local ds = GuiConfig.DiscordSet
+    local DISCORD_H      = 28
+    local DISCORD_MARGIN = 3
+    local discordBottomOffset = ds.Enable and ds.Link ~= "" and (DISCORD_H + DISCORD_MARGIN + 2) or 0
+
+    if ds.Enable and ds.Link ~= "" then
+        local resolvedIcon = getIconId(ds.Icon)
+        if resolvedIcon == "" then resolvedIcon = "rbxassetid://7072725342" end
+
+        local DiscordCard = Instance.new("TextButton")
+        DiscordCard.Name                   = "DiscordCard"
+        DiscordCard.AnchorPoint            = Vector2.new(0, 1)
+        DiscordCard.Position               = UDim2.new(0, 3, 1, -DISCORD_MARGIN)
+        DiscordCard.Size                   = UDim2.new(1, -18, 0, DISCORD_H)
+        DiscordCard.BackgroundColor3       = Color3.fromRGB(22, 22, 28)
+        DiscordCard.BackgroundTransparency = 0
+        DiscordCard.BorderSizePixel        = 0
+        DiscordCard.ClipsDescendants       = false
+        DiscordCard.ZIndex                 = 100
+        DiscordCard.Text                   = ""
+        DiscordCard.Parent                 = LayersTab
+        Instance.new("UICorner", DiscordCard).CornerRadius = UDim.new(0, 5)
+
+        -- Border tipis accent dengan pulse glow
+        local CardStroke = Instance.new("UIStroke")
+        CardStroke.Color           = GuiConfig.Color
+        CardStroke.Thickness       = 0.8
+        CardStroke.Transparency    = 0.5
+        CardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        CardStroke.Parent          = DiscordCard
+
+        task.spawn(function()
+            local t = 0
+            while DiscordCard and DiscordCard.Parent do
+                local dt = task.wait(0.04)
+                t = t + dt
+                local pulse = (math.sin(t * 1.5) + 1) / 2
+                CardStroke.Transparency = 0.2 + pulse * 0.55
+            end
+        end)
+
+        -- Icon
+        local DIcon = Instance.new("ImageLabel")
+        DIcon.BackgroundTransparency = 1
+        DIcon.AnchorPoint   = Vector2.new(0, 0.5)
+        DIcon.Position      = UDim2.new(0, 5, 0.5, 0)
+        DIcon.Size          = UDim2.new(0, 18, 0, 18)
+        DIcon.Image         = resolvedIcon
+        DIcon.ImageColor3   = Color3.fromRGB(255, 255, 255)
+        DIcon.ScaleType     = Enum.ScaleType.Fit
+        DIcon.ZIndex        = 101
+        DIcon.Parent        = DiscordCard
+
+        -- Teks atas: nama script (UPPERCASE)
+        local DTitle = Instance.new("TextLabel")
+        DTitle.Font                 = Enum.Font.GothamBold
+        DTitle.Text                 = string.upper(ds.Title)
+        DTitle.TextColor3           = Color3.fromRGB(255, 255, 255)
+        DTitle.TextSize             = 10
+        DTitle.TextXAlignment       = Enum.TextXAlignment.Left
+        DTitle.BackgroundTransparency = 1
+        DTitle.AnchorPoint          = Vector2.new(0, 1)
+        DTitle.Position             = UDim2.new(0, 28, 0.5, -1)
+        DTitle.Size                 = UDim2.new(1, -32, 0, 11)
+        DTitle.ZIndex               = 101
+        DTitle.Parent               = DiscordCard
+
+        -- Teks bawah: JOIN DISCORD (fixed cyan)
+        local DSub = Instance.new("TextLabel")
+        DSub.Font                 = Enum.Font.GothamBold
+        DSub.Text                 = "JOIN DISCORD"
+        DSub.TextColor3           = Color3.fromRGB(30, 200, 255)
+        DSub.TextSize             = 8
+        DSub.TextXAlignment       = Enum.TextXAlignment.Left
+        DSub.BackgroundTransparency = 1
+        DSub.AnchorPoint          = Vector2.new(0, 0)
+        DSub.Position             = UDim2.new(0, 28, 0.5, 1)
+        DSub.Size                 = UDim2.new(1, -32, 0, 10)
+        DSub.ZIndex               = 101
+        DSub.Parent               = DiscordCard
+
+        -- Animasi warna DTitle: sweep kiri → kanan → kiri
+        local GradTitle = Instance.new("UIGradient")
+        GradTitle.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0,   Color3.fromRGB(255, 255, 255)),
+            ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255, 255, 255)),
+            ColorSequenceKeypoint.new(0.5, GuiConfig.Color),
+            ColorSequenceKeypoint.new(0.6, Color3.fromRGB(255, 255, 255)),
+            ColorSequenceKeypoint.new(1,   Color3.fromRGB(255, 255, 255)),
+        })
+        GradTitle.Rotation = 0
+        GradTitle.Offset   = Vector2.new(-1, 0)
+        GradTitle.Parent   = DTitle
+
+        task.spawn(function()
+            local dir   = 1
+            local pos   = -1.0
+            local speed = 0.8
+            while DiscordCard and DiscordCard.Parent do
+                local dt = task.wait(0.03)
+                pos = pos + speed * dir * dt
+                if pos >= 1.0 then pos = 1.0; dir = -1
+                elseif pos <= -1.0 then pos = -1.0; dir = 1 end
+                GradTitle.Offset = Vector2.new(pos, 0)
+            end
+        end)
+
+        -- Klik: salin link
+        local _copied = false
+        DiscordCard.Activated:Connect(function()
+            if _copied then return end
+            _copied = true
+            pcall(function() setclipboard(ds.Link) end)
+            local origText  = DSub.Text
+            local origColor = DSub.TextColor3
+            DSub.Text       = "LINK COPIED!"
+            DSub.TextColor3 = Color3.fromRGB(180, 180, 180)
+            task.wait(1.5)
+            DSub.Text       = origText
+            DSub.TextColor3 = origColor
+            _copied = false
+        end)
+    end
+    -- ══════════════════════════════════════════════════════════════════
+
+    -- ShowUser + ScrollTab size (dengan mempertimbangkan discordBottomOffset)
     if GuiConfig.ShowUser then
         ScrollTab.Position = UDim2.new(0, 0, 0, searchOffset)
-        ScrollTab.Size = UDim2.new(1, 0, 1, -(40 + searchOffset))
+        ScrollTab.Size = UDim2.new(1, 0, 1, -(40 + searchOffset + discordBottomOffset))
     else
         ScrollTab.Position = UDim2.new(0, 0, 0, searchOffset)
-        ScrollTab.Size = UDim2.new(1, 0, 1, -searchOffset)
+        ScrollTab.Size = UDim2.new(1, 0, 1, -(searchOffset + discordBottomOffset))
     end
 
     ScrollTab.Parent = LayersTab
@@ -1603,12 +1341,13 @@ function Chloex:Window(GuiConfig)
     ScrollTab.ChildRemoved:Connect(UpdateSize1)
 
     if GuiConfig.ShowUser then
+        local pfOffsetY = -(3 + discordBottomOffset)
         local PlayerFooter = Instance.new("Frame")
         PlayerFooter.Name = "PlayerFooter"
         PlayerFooter.AnchorPoint = Vector2.new(0, 1)
         PlayerFooter.BackgroundTransparency = 1
         PlayerFooter.BorderSizePixel = 0
-        PlayerFooter.Position = UDim2.new(0, 3, 1, -3)
+        PlayerFooter.Position = UDim2.new(0, 3, 1, pfOffsetY)
         PlayerFooter.Size = UDim2.new(1, -18, 0, 40)
         PlayerFooter.Parent = LayersTab
         PlayerFooter.ZIndex = 100
@@ -1715,7 +1454,7 @@ function Chloex:Window(GuiConfig)
     LayersPageLayout.EasingStyle = Enum.EasingStyle.Quad
 
     function GuiFunc:DestroyGui()
-        if CoreGui:FindFirstChild("Chloeex") then
+        if CoreGui:FindFirstChild("LexsHub") then
             Chloeex:Destroy()
         end
     end
@@ -1840,9 +1579,24 @@ function Chloex:Window(GuiConfig)
         return TagApi
     end
 
+    local _lastPos = nil
+
+    local function AnimateClose(callback)
+        _lastPos = DropShadowHolder.Position
+        DropShadowHolder.Visible = false
+        if callback then callback() end
+    end
+
+    local function AnimateOpen()
+        if _lastPos then
+            DropShadowHolder.Position = _lastPos
+        end
+        DropShadowHolder.Visible = true
+    end
+
     Min.Activated:Connect(function()
         CircleClick(Min, Mouse.X, Mouse.Y)
-        DropShadowHolder.Visible = false
+        AnimateClose()
     end)
 
     Close.Activated:Connect(function()
@@ -1854,11 +1608,13 @@ function Chloex:Window(GuiConfig)
                 {
                     Name = "Yes",
                     Callback = function()
-                        if Chloeex then Chloeex:Destroy() end
-                        if GuiFunc._toggleGui then
-                            pcall(function() GuiFunc._toggleGui:Destroy() end)
-                            GuiFunc._toggleGui = nil
-                        end
+                        AnimateClose(function()
+                            if Chloeex then Chloeex:Destroy() end
+                            if GuiFunc._toggleGui then
+                                pcall(function() GuiFunc._toggleGui:Destroy() end)
+                                GuiFunc._toggleGui = nil
+                            end
+                        end)
                     end
                 },
                 {
@@ -1903,7 +1659,19 @@ function Chloex:Window(GuiConfig)
 
         Button.MouseButton1Click:Connect(function()
             if DropShadowHolder then
-                DropShadowHolder.Visible = not DropShadowHolder.Visible
+                if DropShadowHolder.Visible then
+                    AnimateClose(function()
+                        DropShadowHolder.Visible = false
+                        DropShadowHolder.Position = UDim2.new(
+                            DropShadowHolder.Position.X.Scale,
+                            DropShadowHolder.Position.X.Offset,
+                            DropShadowHolder.Position.Y.Scale,
+                            DropShadowHolder.Position.Y.Offset + 30
+                        )
+                    end)
+                else
+                    AnimateOpen()
+                end
             end
         end)
 
@@ -1945,7 +1713,19 @@ function Chloex:Window(GuiConfig)
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end
         if input.KeyCode == GuiConfig.Keybind then
-            DropShadowHolder.Visible = not DropShadowHolder.Visible
+            if DropShadowHolder.Visible then
+                AnimateClose(function()
+                    DropShadowHolder.Visible = false
+                    DropShadowHolder.Position = UDim2.new(
+                        DropShadowHolder.Position.X.Scale,
+                        DropShadowHolder.Position.X.Offset,
+                        DropShadowHolder.Position.Y.Scale,
+                        DropShadowHolder.Position.Y.Offset + 30
+                    )
+                end)
+            else
+                AnimateOpen()
+            end
         end
     end)
 
@@ -2091,6 +1871,9 @@ function Chloex:Window(GuiConfig)
         GuiFunc[k] = v
     end
 
+    -- ══════════════════════════════════════════════════════════════
+    -- Inject AddColorpicker
+    -- ══════════════════════════════════════════════════════════════
     local origAddTab = GuiFunc.AddTab
     GuiFunc.AddTab = function(self, TabConfig)
         local Sections = origAddTab(self, TabConfig)
@@ -2135,7 +1918,6 @@ function Chloex:Window(GuiConfig)
                 end
 
                 if not sa then
-                    warn("[LexsHub] AddColorpicker: tidak bisa deteksi parent section.")
                     return {}
                 end
 
@@ -2149,6 +1931,188 @@ function Chloex:Window(GuiConfig)
         end
         return Sections
     end
+
+    -- ══════════════════════════════════════════════════════════════
+    -- Notification
+    -- ══════════════════════════════════════════════════════════════
+    function GuiFunc:Notify(Config)
+        Config = Config or {}
+        Config.Title    = Config.Title   or "Notification"
+        Config.Content  = Config.Content or ""
+        Config.Duration = Config.Duration or 5
+        Config.Buttons  = Config.Buttons or {}
+
+        local NotifGui = CoreGui:FindFirstChild("LexsHub_Notifs")
+        if not NotifGui then
+            NotifGui = Instance.new("ScreenGui")
+            NotifGui.Name = "LexsHub_Notifs"
+            NotifGui.ResetOnSpawn = false
+            NotifGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+            NotifGui.Parent = CoreGui
+
+            local Container = Instance.new("Frame")
+            Container.Name = "Container"
+            Container.BackgroundTransparency = 1
+            Container.AnchorPoint = Vector2.new(1, 1)
+            Container.Position = UDim2.new(1, -16, 1, -16)
+            Container.Size = UDim2.new(0, 280, 1, -32)
+            Container.Parent = NotifGui
+
+            local List = Instance.new("UIListLayout")
+            List.SortOrder = Enum.SortOrder.LayoutOrder
+            List.VerticalAlignment = Enum.VerticalAlignment.Bottom
+            List.Padding = UDim.new(0, 8)
+            List.Parent = Container
+        end
+
+        local Container = NotifGui:FindFirstChild("Container")
+
+        local Card = Instance.new("Frame")
+        Card.Name = "NotifCard"
+        Card.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+        Card.BorderSizePixel = 0
+        Card.Size = UDim2.new(1, 0, 0, 0)
+        Card.AutomaticSize = Enum.AutomaticSize.Y
+        Card.ClipsDescendants = true
+        Card.Parent = Container
+
+        Instance.new("UICorner", Card).CornerRadius = UDim.new(0, 8)
+
+        local CardStroke = Instance.new("UIStroke")
+        CardStroke.Color = GuiConfig.Color
+        CardStroke.Thickness = 1
+        CardStroke.Transparency = 0.6
+        CardStroke.Parent = Card
+
+        local CardPad = Instance.new("UIPadding")
+        CardPad.PaddingTop    = UDim.new(0, 10)
+        CardPad.PaddingBottom = UDim.new(0, 10)
+        CardPad.PaddingLeft   = UDim.new(0, 14)
+        CardPad.PaddingRight  = UDim.new(0, 12)
+        CardPad.Parent = Card
+
+        local CardList = Instance.new("UIListLayout")
+        CardList.SortOrder = Enum.SortOrder.LayoutOrder
+        CardList.Padding = UDim.new(0, 6)
+        CardList.Parent = Card
+
+        local Accent = Instance.new("Frame")
+        Accent.BackgroundColor3 = GuiConfig.Color
+        Accent.BorderSizePixel = 0
+        Accent.Size = UDim2.new(0, 3, 1, 0)
+        Accent.Position = UDim2.new(0, 0, 0, 0)
+        Accent.ZIndex = 2
+        Accent.Parent = Card
+        Instance.new("UICorner", Accent).CornerRadius = UDim.new(1, 0)
+
+        local TitleLabel = Instance.new("TextLabel")
+        TitleLabel.Text = Config.Title
+        TitleLabel.Font = Enum.Font.GothamBold
+        TitleLabel.TextSize = 13
+        TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        TitleLabel.BackgroundTransparency = 1
+        TitleLabel.Size = UDim2.new(1, 0, 0, 0)
+        TitleLabel.AutomaticSize = Enum.AutomaticSize.Y
+        TitleLabel.TextWrapped = true
+        TitleLabel.LayoutOrder = 0
+        TitleLabel.Parent = Card
+
+        if Config.Content ~= "" then
+            local ContentLabel = Instance.new("TextLabel")
+            ContentLabel.Text = Config.Content
+            ContentLabel.Font = Enum.Font.Gotham
+            ContentLabel.TextSize = 11
+            ContentLabel.TextColor3 = Color3.fromRGB(170, 170, 185)
+            ContentLabel.TextXAlignment = Enum.TextXAlignment.Left
+            ContentLabel.BackgroundTransparency = 1
+            ContentLabel.Size = UDim2.new(1, 0, 0, 0)
+            ContentLabel.AutomaticSize = Enum.AutomaticSize.Y
+            ContentLabel.TextWrapped = true
+            ContentLabel.LayoutOrder = 1
+            ContentLabel.Parent = Card
+        end
+
+        if #Config.Buttons > 0 then
+            local BtnRow = Instance.new("Frame")
+            BtnRow.BackgroundTransparency = 1
+            BtnRow.Size = UDim2.new(1, 0, 0, 28)
+            BtnRow.LayoutOrder = 2
+            BtnRow.Parent = Card
+
+            local BtnList = Instance.new("UIListLayout")
+            BtnList.FillDirection = Enum.FillDirection.Horizontal
+            BtnList.HorizontalAlignment = Enum.HorizontalAlignment.Right
+            BtnList.VerticalAlignment = Enum.VerticalAlignment.Center
+            BtnList.Padding = UDim.new(0, 6)
+            BtnList.Parent = BtnRow
+
+            for idx, btnCfg in ipairs(Config.Buttons) do
+                local Btn = Instance.new("TextButton")
+                Btn.Text = btnCfg.Name or ("Button" .. idx)
+                Btn.Font = Enum.Font.GothamBold
+                Btn.TextSize = 11
+                Btn.AutomaticSize = Enum.AutomaticSize.X
+                Btn.Size = UDim2.new(0, 0, 1, 0)
+                Btn.BorderSizePixel = 0
+                Btn.LayoutOrder = idx
+
+                local isPrimary = btnCfg.Primary == true or idx == 1
+                if isPrimary then
+                    Btn.BackgroundColor3 = GuiConfig.Color
+                    Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                else
+                    Btn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+                    Btn.TextColor3 = Color3.fromRGB(180, 180, 195)
+                end
+
+                Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 5)
+
+                local BtnPad = Instance.new("UIPadding")
+                BtnPad.PaddingLeft  = UDim.new(0, 10)
+                BtnPad.PaddingRight = UDim.new(0, 10)
+                BtnPad.Parent = Btn
+
+                Btn.Parent = BtnRow
+
+                Btn.MouseButton1Click:Connect(function()
+                    if btnCfg.Callback then pcall(btnCfg.Callback) end
+                    Card:Destroy()
+                end)
+            end
+        end
+
+        if Config.Duration > 0 and #Config.Buttons == 0 then
+            local ProgressBg = Instance.new("Frame")
+            ProgressBg.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+            ProgressBg.BorderSizePixel = 0
+            ProgressBg.Size = UDim2.new(1, 0, 0, 3)
+            ProgressBg.LayoutOrder = 3
+            ProgressBg.Parent = Card
+            Instance.new("UICorner", ProgressBg).CornerRadius = UDim.new(1, 0)
+
+            local ProgressBar = Instance.new("Frame")
+            ProgressBar.BackgroundColor3 = GuiConfig.Color
+            ProgressBar.BorderSizePixel = 0
+            ProgressBar.Size = UDim2.new(1, 0, 1, 0)
+            ProgressBar.Parent = ProgressBg
+            Instance.new("UICorner", ProgressBar).CornerRadius = UDim.new(1, 0)
+
+            TweenService:Create(ProgressBar, TweenInfo.new(Config.Duration, Enum.EasingStyle.Linear), {
+                Size = UDim2.new(0, 0, 1, 0)
+            }):Play()
+
+            task.delay(Config.Duration, function()
+                if Card and Card.Parent then Card:Destroy() end
+            end)
+        end
+
+        Card.Position = UDim2.new(1, 300, 0, 0)
+        TweenService:Create(Card, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Position = UDim2.new(0, 0, 0, 0)
+        }):Play()
+    end
+    -- ══════════════════════════════════════════════════════════════
 
     return GuiFunc
 end
